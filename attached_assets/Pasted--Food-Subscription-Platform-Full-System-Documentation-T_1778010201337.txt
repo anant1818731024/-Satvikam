@@ -1,0 +1,258 @@
+🚀 Food Subscription Platform — Full System Documentation
+🧩 Tech Stack
+Frontend: Next.js
+Backend + DB: Supabase
+Payments: Razorpay
+Hosting: Vercel
+Communication: WhatsApp
+🎯 What You’re Building
+
+A subscription-based food delivery platform with:
+
+👤 User Side
+Browse menu & plans
+Subscribe (enter details + pay)
+Get confirmation (web + WhatsApp)
+🧑‍💻 Admin Side
+Manage products & plans
+View all orders
+Track active subscriptions
+Create manual orders
+Monitor payments
+🧠 Core Architecture Principle
+
+✅ Order is created BEFORE payment
+✅ Payment is verified via webhook
+✅ Subscription is created AFTER payment
+
+🧱 Database Design (Supabase)
+1. Users
+id uuid primary key
+name text
+phone text
+address text
+pincode text
+created_at timestamp
+2. Products
+id uuid
+name text
+price int
+type text (veg/non-veg)
+3. Plans
+id uuid
+name text
+price int
+meals_per_day int
+duration_days int
+4. Orders
+id uuid
+order_id text
+user_id uuid
+plan_id uuid
+amount int
+status text (pending/paid)
+payment_id text
+created_at timestamp
+5. Subscriptions
+id uuid
+user_id uuid
+plan_id uuid
+order_id text
+start_date timestamp
+end_date timestamp
+status text (active/inactive)
+🔄 COMPLETE USER FLOW
+Step 1 — User selects plan
+Opens /subscription
+Chooses plan
+Step 2 — Fill details
+Name
+Phone
+Address
+
+👉 Save in DB:
+
+status = "pending"
+order_id = "ORD-xxxx"
+Step 3 — Payment (Razorpay)
+Create order via API
+Pass metadata:
+notes: {
+  order_id,
+  phone
+}
+Step 4 — Payment success (Webhook)
+
+Razorpay calls:
+
+/api/webhook
+Step 5 — Backend updates
+Mark order = paid
+Save payment_id
+Create subscription
+Step 6 — Confirmation
+Website:
+Redirect to /success
+WhatsApp:
+Hi <name>,
+Payment successful ✅
+Order ID: ORD-123
+Subscription active 🎉
+💬 WhatsApp Integration
+Basic (MVP)
+https://wa.me/91XXXXXXXXXX?text=Hi, I placed order ORD-123
+Use Cases
+Pre-sale queries
+Post-payment confirmation
+Support
+🧑‍💻 ADMIN PANEL
+Routes
+/admin
+/admin/products
+/admin/plans
+/admin/orders
+/admin/subscriptions
+🔹 1. Products Management
+Add product
+Edit/delete
+Fields:
+Name
+Price
+Type
+🔹 2. Plans Management
+Create subscription plans
+Fields:
+Name
+Price
+Meals per day
+Duration
+🔹 3. Orders Page
+Table view:
+Order ID
+User
+Plan
+Status
+Payment ID
+Filters:
+Pending
+Paid
+🔹 4. Subscriptions Page
+Active subscriptions:
+User
+Plan
+Start date
+End date
+Status
+Past subscriptions:
+Same data with status = inactive
+🔹 5. Manual Order Creation (IMPORTANT)
+
+Admin can:
+
+Add user details
+Select plan
+Generate order
+Share payment link
+
+👉 Useful for:
+
+WhatsApp orders
+Offline customers
+💰 PAYMENT SYSTEM
+Flow
+User → Create Order → Razorpay → Webhook → DB update → Subscription created
+Razorpay Integration
+Use Orders API
+Attach:
+order_id
+phone
+Webhook Verification (CRITICAL)
+Use HMAC SHA256
+Compare:
+received signature
+generated signature
+🔐 SECURITY
+Must implement
+Webhook signature verification
+Environment variables (never expose secrets)
+Admin authentication (Supabase Auth)
+Recommended later
+Row Level Security (RLS)
+API validation
+📊 PAGES OVERVIEW
+User Pages
+/
+Landing page
+Menu preview
+CTA buttons
+/menu
+List of food items
+/subscription
+Plans
+Subscribe button
+/subscribe
+Form + payment
+/success
+Payment confirmation
+Order details
+WhatsApp button
+Admin Pages
+/admin/orders
+All orders
+/admin/subscriptions
+Active + past subscriptions
+/admin/products
+CRUD products
+/admin/plans
+CRUD plans
+🧠 BEST PRACTICES (IMPORTANT)
+✅ Do this
+Always generate Order ID
+Always store order before payment
+Use webhook for confirmation
+Keep admin simple
+Use WhatsApp for trust
+❌ Avoid this
+Payment before collecting details
+No order tracking
+Relying on screenshots
+Overbuilding early
+🚀 DEPLOYMENT
+Push to GitHub
+Deploy on Vercel
+Add env variables
+Configure Razorpay webhook
+📈 SCALING PLAN
+Phase 1 (MVP)
+Manual + semi-automated
+WhatsApp support
+Phase 2
+Admin automation
+Better UI
+Subscription tracking
+Phase 3
+Delivery management
+Mobile app
+Analytics
+🔥 FINAL ARCHITECTURE
+Frontend (Next.js)
+        ↓
+Supabase (DB + Auth)
+        ↓
+Razorpay (Payments)
+        ↓
+Webhook (Verification)
+        ↓
+Subscription Engine
+        ↓
+WhatsApp (Communication)
+🧾 FINAL SUMMARY
+
+You now have a system that:
+
+✔ Collects user details properly
+✔ Matches payments reliably
+✔ Tracks subscriptions
+✔ Supports admin operations
+✔ Builds trust via WhatsApp
+✔ Runs on mostly FREE infrastructure
