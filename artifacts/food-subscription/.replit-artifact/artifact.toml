@@ -1,0 +1,31 @@
+kind = "web"
+previewPath = "/"
+title = "Food Subscription Platform"
+version = "1.0.0"
+id = "artifacts/food-subscription"
+router = "path"
+
+[[integratedSkills]]
+name = "react-vite"
+version = "1.0.0"
+
+[[services]]
+name = "web"
+paths = [ "/" ]
+localPort = 20626
+
+[services.development]
+run = "pnpm --filter @workspace/food-subscription run dev"
+
+[services.production]
+build = [ "pnpm", "--filter", "@workspace/food-subscription", "run", "build" ]
+publicDir = "artifacts/food-subscription/dist/public"
+serve = "static"
+
+[[services.production.rewrites]]
+from = "/*"
+to = "/index.html"
+
+[services.env]
+PORT = "20626"
+BASE_PATH = "/"

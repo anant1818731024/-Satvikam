@@ -3,13 +3,28 @@ info:
   # Do not change the title, if the title changes, the import paths will be broken
   title: Api
   version: 0.1.0
-  description: API specification
+  description: Food Subscription Platform API
 servers:
   - url: /api
     description: Base API path
 tags:
   - name: health
     description: Health operations
+  - name: products
+    description: Food product management
+  - name: plans
+    description: Subscription plan management
+  - name: users
+    description: User management
+  - name: orders
+    description: Order management
+  - name: subscriptions
+    description: Subscription management
+  - name: payments
+    description: Payment operations
+  - name: admin
+    description: Admin operations
+
 paths:
   /healthz:
     get:
@@ -24,6 +39,425 @@ paths:
             application/json:
               schema:
                 $ref: "#/components/schemas/HealthStatus"
+
+  # Products
+  /products:
+    get:
+      operationId: listProducts
+      tags: [products]
+      summary: List all products
+      responses:
+        "200":
+          description: List of products
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: "#/components/schemas/Product"
+    post:
+      operationId: createProduct
+      tags: [products]
+      summary: Create a product
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/CreateProductBody"
+      responses:
+        "201":
+          description: Created product
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/Product"
+        "400":
+          description: Validation error
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ErrorResponse"
+
+  /products/{id}:
+    patch:
+      operationId: updateProduct
+      tags: [products]
+      summary: Update a product
+      parameters:
+        - in: path
+          name: id
+          required: true
+          schema:
+            type: integer
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/UpdateProductBody"
+      responses:
+        "200":
+          description: Updated product
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/Product"
+        "404":
+          description: Not found
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ErrorResponse"
+    delete:
+      operationId: deleteProduct
+      tags: [products]
+      summary: Delete a product
+      parameters:
+        - in: path
+          name: id
+          required: true
+          schema:
+            type: integer
+      responses:
+        "204":
+          description: Deleted
+        "404":
+          description: Not found
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ErrorResponse"
+
+  # Plans
+  /plans:
+    get:
+      operationId: listPlans
+      tags: [plans]
+      summary: List all subscription plans
+      responses:
+        "200":
+          description: List of plans
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: "#/components/schemas/Plan"
+    post:
+      operationId: createPlan
+      tags: [plans]
+      summary: Create a subscription plan
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/CreatePlanBody"
+      responses:
+        "201":
+          description: Created plan
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/Plan"
+        "400":
+          description: Validation error
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ErrorResponse"
+
+  /plans/{id}:
+    patch:
+      operationId: updatePlan
+      tags: [plans]
+      summary: Update a plan
+      parameters:
+        - in: path
+          name: id
+          required: true
+          schema:
+            type: integer
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/UpdatePlanBody"
+      responses:
+        "200":
+          description: Updated plan
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/Plan"
+        "404":
+          description: Not found
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ErrorResponse"
+    delete:
+      operationId: deletePlan
+      tags: [plans]
+      summary: Delete a plan
+      parameters:
+        - in: path
+          name: id
+          required: true
+          schema:
+            type: integer
+      responses:
+        "204":
+          description: Deleted
+        "404":
+          description: Not found
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ErrorResponse"
+
+  # Users
+  /users:
+    get:
+      operationId: listUsers
+      tags: [users]
+      summary: List all users
+      responses:
+        "200":
+          description: List of users
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: "#/components/schemas/User"
+    post:
+      operationId: createUser
+      tags: [users]
+      summary: Create a user
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/CreateUserBody"
+      responses:
+        "201":
+          description: Created user
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/User"
+        "400":
+          description: Validation error
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ErrorResponse"
+
+  # Orders
+  /orders:
+    get:
+      operationId: listOrders
+      tags: [orders]
+      summary: List orders
+      parameters:
+        - in: query
+          name: status
+          required: false
+          schema:
+            type: string
+            enum: [pending, paid]
+      responses:
+        "200":
+          description: List of orders
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: "#/components/schemas/Order"
+    post:
+      operationId: createOrder
+      tags: [orders]
+      summary: Create an order
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/CreateOrderBody"
+      responses:
+        "201":
+          description: Created order
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/Order"
+        "400":
+          description: Validation error
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ErrorResponse"
+
+  /orders/{id}:
+    get:
+      operationId: getOrder
+      tags: [orders]
+      summary: Get an order by ID
+      parameters:
+        - in: path
+          name: id
+          required: true
+          schema:
+            type: integer
+      responses:
+        "200":
+          description: Order
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/Order"
+        "404":
+          description: Not found
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ErrorResponse"
+    patch:
+      operationId: updateOrder
+      tags: [orders]
+      summary: Update order status or payment info
+      parameters:
+        - in: path
+          name: id
+          required: true
+          schema:
+            type: integer
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/UpdateOrderBody"
+      responses:
+        "200":
+          description: Updated order
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/Order"
+        "404":
+          description: Not found
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ErrorResponse"
+
+  # Subscriptions
+  /subscriptions:
+    get:
+      operationId: listSubscriptions
+      tags: [subscriptions]
+      summary: List subscriptions
+      parameters:
+        - in: query
+          name: status
+          required: false
+          schema:
+            type: string
+            enum: [active, inactive]
+      responses:
+        "200":
+          description: List of subscriptions
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: "#/components/schemas/Subscription"
+
+  /subscriptions/{id}:
+    get:
+      operationId: getSubscription
+      tags: [subscriptions]
+      summary: Get subscription by ID
+      parameters:
+        - in: path
+          name: id
+          required: true
+          schema:
+            type: integer
+      responses:
+        "200":
+          description: Subscription
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/Subscription"
+        "404":
+          description: Not found
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ErrorResponse"
+
+  # Payment
+  /payment/create-order:
+    post:
+      operationId: createPaymentOrder
+      tags: [payments]
+      summary: Create a Razorpay payment order
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/CreatePaymentOrderBody"
+      responses:
+        "200":
+          description: Razorpay order details
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/PaymentOrder"
+        "400":
+          description: Error
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ErrorResponse"
+
+  /payment/webhook:
+    post:
+      operationId: handlePaymentWebhook
+      tags: [payments]
+      summary: Handle Razorpay webhook
+      responses:
+        "200":
+          description: Webhook processed
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/WebhookResponse"
+
+  # Admin summary
+  /admin/summary:
+    get:
+      operationId: getAdminSummary
+      tags: [admin]
+      summary: Get admin dashboard summary stats
+      responses:
+        "200":
+          description: Summary statistics
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/AdminSummary"
+
 components:
   schemas:
     HealthStatus:
@@ -34,3 +468,327 @@ components:
       required:
         - status
 
+    ErrorResponse:
+      type: object
+      properties:
+        error:
+          type: string
+      required:
+        - error
+
+    Product:
+      type: object
+      properties:
+        id:
+          type: integer
+        name:
+          type: string
+        price:
+          type: integer
+        type:
+          type: string
+          enum: [veg, non-veg]
+        description:
+          type: ["string", "null"]
+        createdAt:
+          type: string
+          format: date-time
+      required:
+        - id
+        - name
+        - price
+        - type
+        - description
+        - createdAt
+
+    CreateProductBody:
+      type: object
+      properties:
+        name:
+          type: string
+        price:
+          type: integer
+        type:
+          type: string
+          enum: [veg, non-veg]
+        description:
+          type: string
+      required:
+        - name
+        - price
+        - type
+
+    UpdateProductBody:
+      type: object
+      properties:
+        name:
+          type: string
+        price:
+          type: integer
+        type:
+          type: string
+          enum: [veg, non-veg]
+        description:
+          type: string
+
+    Plan:
+      type: object
+      properties:
+        id:
+          type: integer
+        name:
+          type: string
+        price:
+          type: integer
+        mealsPerDay:
+          type: integer
+        durationDays:
+          type: integer
+        description:
+          type: ["string", "null"]
+        createdAt:
+          type: string
+          format: date-time
+      required:
+        - id
+        - name
+        - price
+        - mealsPerDay
+        - durationDays
+        - description
+        - createdAt
+
+    CreatePlanBody:
+      type: object
+      properties:
+        name:
+          type: string
+        price:
+          type: integer
+        mealsPerDay:
+          type: integer
+        durationDays:
+          type: integer
+        description:
+          type: string
+      required:
+        - name
+        - price
+        - mealsPerDay
+        - durationDays
+
+    UpdatePlanBody:
+      type: object
+      properties:
+        name:
+          type: string
+        price:
+          type: integer
+        mealsPerDay:
+          type: integer
+        durationDays:
+          type: integer
+        description:
+          type: string
+
+    User:
+      type: object
+      properties:
+        id:
+          type: integer
+        name:
+          type: string
+        phone:
+          type: string
+        address:
+          type: string
+        pincode:
+          type: string
+        createdAt:
+          type: string
+          format: date-time
+      required:
+        - id
+        - name
+        - phone
+        - address
+        - pincode
+        - createdAt
+
+    CreateUserBody:
+      type: object
+      properties:
+        name:
+          type: string
+        phone:
+          type: string
+        address:
+          type: string
+        pincode:
+          type: string
+      required:
+        - name
+        - phone
+        - address
+        - pincode
+
+    Order:
+      type: object
+      properties:
+        id:
+          type: integer
+        orderId:
+          type: string
+        userId:
+          type: integer
+        planId:
+          type: integer
+        amount:
+          type: integer
+        status:
+          type: string
+          enum: [pending, paid]
+        paymentId:
+          type: ["string", "null"]
+        userName:
+          type: ["string", "null"]
+        planName:
+          type: ["string", "null"]
+        createdAt:
+          type: string
+          format: date-time
+      required:
+        - id
+        - orderId
+        - userId
+        - planId
+        - amount
+        - status
+        - paymentId
+        - userName
+        - planName
+        - createdAt
+
+    CreateOrderBody:
+      type: object
+      properties:
+        userId:
+          type: integer
+        planId:
+          type: integer
+        amount:
+          type: integer
+      required:
+        - userId
+        - planId
+        - amount
+
+    UpdateOrderBody:
+      type: object
+      properties:
+        status:
+          type: string
+          enum: [pending, paid]
+        paymentId:
+          type: string
+
+    Subscription:
+      type: object
+      properties:
+        id:
+          type: integer
+        userId:
+          type: integer
+        planId:
+          type: integer
+        orderId:
+          type: string
+        startDate:
+          type: string
+          format: date-time
+        endDate:
+          type: string
+          format: date-time
+        status:
+          type: string
+          enum: [active, inactive]
+        userName:
+          type: ["string", "null"]
+        planName:
+          type: ["string", "null"]
+        createdAt:
+          type: string
+          format: date-time
+      required:
+        - id
+        - userId
+        - planId
+        - orderId
+        - startDate
+        - endDate
+        - status
+        - userName
+        - planName
+        - createdAt
+
+    CreatePaymentOrderBody:
+      type: object
+      properties:
+        orderId:
+          type: string
+        amount:
+          type: integer
+        phone:
+          type: string
+      required:
+        - orderId
+        - amount
+        - phone
+
+    PaymentOrder:
+      type: object
+      properties:
+        razorpayOrderId:
+          type: string
+        amount:
+          type: integer
+        currency:
+          type: string
+        orderId:
+          type: string
+      required:
+        - razorpayOrderId
+        - amount
+        - currency
+        - orderId
+
+    WebhookResponse:
+      type: object
+      properties:
+        success:
+          type: boolean
+      required:
+        - success
+
+    AdminSummary:
+      type: object
+      properties:
+        totalRevenue:
+          type: integer
+        activeSubscriptions:
+          type: integer
+        pendingOrders:
+          type: integer
+        totalOrders:
+          type: integer
+        totalUsers:
+          type: integer
+        paidOrders:
+          type: integer
+      required:
+        - totalRevenue
+        - activeSubscriptions
+        - pendingOrders
+        - totalOrders
+        - totalUsers
+        - paidOrders
