@@ -6,7 +6,6 @@ export const productsTable = pgTable("products", {
   id: serial("id").primaryKey(),
   name: text("name").notNull(),
   price: integer("price").notNull(),
-  type: text("type").notNull().$type<"veg" | "non-veg">(),
   description: text("description"),
   createdAt: timestamp("created_at", { withTimezone: true }).notNull().defaultNow(),
 });

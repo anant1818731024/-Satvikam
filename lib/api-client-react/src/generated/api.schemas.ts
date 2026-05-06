@@ -13,50 +13,24 @@ export interface ErrorResponse {
   error: string;
 }
 
-export type ProductType = (typeof ProductType)[keyof typeof ProductType];
-
-export const ProductType = {
-  veg: "veg",
-  "non-veg": "non-veg",
-} as const;
-
 export interface Product {
   id: number;
   name: string;
   price: number;
-  type: ProductType;
   /** @nullable */
   description: string | null;
   createdAt: string;
 }
 
-export type CreateProductBodyType =
-  (typeof CreateProductBodyType)[keyof typeof CreateProductBodyType];
-
-export const CreateProductBodyType = {
-  veg: "veg",
-  "non-veg": "non-veg",
-} as const;
-
 export interface CreateProductBody {
   name: string;
   price: number;
-  type: CreateProductBodyType;
   description?: string;
 }
-
-export type UpdateProductBodyType =
-  (typeof UpdateProductBodyType)[keyof typeof UpdateProductBodyType];
-
-export const UpdateProductBodyType = {
-  veg: "veg",
-  "non-veg": "non-veg",
-} as const;
 
 export interface UpdateProductBody {
   name?: string;
   price?: number;
-  type?: UpdateProductBodyType;
   description?: string;
 }
 

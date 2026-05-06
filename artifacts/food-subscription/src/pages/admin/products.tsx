@@ -5,8 +5,6 @@ import { formatCurrency } from "@/lib/format";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Textarea } from "@/components/ui/textarea";
-import { Badge } from "@/components/ui/badge";
-import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import {
   Table,
   TableBody,
@@ -40,20 +38,18 @@ export default function AdminProducts() {
   const [formData, setFormData] = useState({
     name: "",
     price: "",
-    type: "veg" as "veg" | "non-veg",
     description: "",
   });
 
   const resetForm = () => {
-    setFormData({ name: "", price: "", type: "veg", description: "" });
+    setFormData({ name: "", price: "", description: "" });
     setEditingId(null);
   };
 
-  const handleEdit = (product: any) => {
+  const handleEdit = (product: { id: number; name: string; price: number; description: string | null }) => {
     setFormData({
       name: product.name,
       price: (product.price / 100).toString(),
-      type: product.type,
       description: product.description || "",
     });
     setEditingId(product.id);
@@ -66,7 +62,7 @@ export default function AdminProducts() {
       await deleteProduct.mutateAsync({ id });
       queryClient.invalidateQueries({ queryKey: getListProductsQueryKey() });
       toast({ title: "Product deleted" });
-    } catch (err) {
+    } catch {
       toast({ title: "Error", description: "Failed to delete product", variant: "destructive" });
     }
   };
@@ -77,7 +73,6 @@ export default function AdminProducts() {
       const payload = {
         name: formData.name,
         price: Math.round(parseFloat(formData.price) * 100),
-        type: formData.type,
         description: formData.description,
       };
 
@@ -92,7 +87,7 @@ export default function AdminProducts() {
       queryClient.invalidateQueries({ queryKey: getListProductsQueryKey() });
       setIsCreateOpen(false);
       resetForm();
-    } catch (err) {
+    } catch {
       toast({ title: "Error", description: "Failed to save product", variant: "destructive" });
     }
   };
@@ -104,7 +99,7 @@ export default function AdminProducts() {
           <h1 className="text-3xl font-bold font-serif text-foreground">Menu Products</h1>
           <p className="text-muted-foreground mt-1">Manage the items available on your menu.</p>
         </div>
-        
+
         <Dialog open={isCreateOpen} onOpenChange={(open) => { setIsCreateOpen(open); if (!open) resetForm(); }}>
           <DialogTrigger asChild>
             <Button><Plus className="w-4 h-4 mr-2" /> Add Product</Button>
@@ -118,22 +113,10 @@ export default function AdminProducts() {
                 <label className="text-sm font-medium">Name</label>
                 <Input required value={formData.name} onChange={e => setFormData({...formData, name: e.target.value})} placeholder="e.g. Saffron Rice Bowl" />
               </div>
-              
-              <div className="grid grid-cols-2 gap-4">
-                <div className="space-y-2">
-                  <label className="text-sm font-medium">Price (INR)</label>
-                  <Input type="number" step="0.01" required value={formData.price} onChange={e => setFormData({...formData, price: e.target.value})} placeholder="150.00" />
-                </div>
-                <div className="space-y-2">
-                  <label className="text-sm font-medium">Type</label>
-                  <Select value={formData.type} onValueChange={(val: any) => setFormData({...formData, type: val})}>
-                    <SelectTrigger><SelectValue /></SelectTrigger>
-                    <SelectContent>
-                      <SelectItem value="veg">Vegetarian</SelectItem>
-                      <SelectItem value="non-veg">Non-Vegetarian</SelectItem>
-                    </SelectContent>
-                  </Select>
-                </div>
+
+              <div className="space-y-2">
+                <label className="text-sm font-medium">Price (INR)</label>
+                <Input type="number" step="0.01" required value={formData.price} onChange={e => setFormData({...formData, price: e.target.value})} placeholder="150.00" />
               </div>
 
               <div className="space-y-2">
@@ -155,7 +138,7 @@ export default function AdminProducts() {
           <TableHeader>
             <TableRow>
               <TableHead>Name</TableHead>
-              <TableHead>Type</TableHead>
+              <TableHead>Description</TableHead>
               <TableHead>Price</TableHead>
               <TableHead className="text-right">Actions</TableHead>
             </TableRow>
@@ -171,13 +154,9 @@ export default function AdminProducts() {
               </TableRow>
             ) : (
               products?.map((product) => (
-                <TableRow key={product.id}>
+                <TableRow key={product.id} data-testid={`row-product-${product.id}`}>
                   <TableCell className="font-medium">{product.name}</TableCell>
-                  <TableCell>
-                    <Badge variant={product.type === "veg" ? "default" : "destructive"} className="uppercase text-[10px]">
-                      {product.type}
-                    </Badge>
-                  </TableCell>
+                  <TableCell className="text-muted-foreground text-sm">{product.description || "—"}</TableCell>
                   <TableCell className="font-mono">{formatCurrency(product.price)}</TableCell>
                   <TableCell className="text-right space-x-2">
                     <Button variant="ghost" size="icon" onClick={() => handleEdit(product)}>

@@ -22,7 +22,6 @@ export const ListProductsResponseItem = zod.object({
   id: zod.number(),
   name: zod.string(),
   price: zod.number(),
-  type: zod.enum(["veg", "non-veg"]),
   description: zod.string().nullable(),
   createdAt: zod.coerce.date(),
 });
@@ -34,7 +33,6 @@ export const ListProductsResponse = zod.array(ListProductsResponseItem);
 export const CreateProductBody = zod.object({
   name: zod.string(),
   price: zod.number(),
-  type: zod.enum(["veg", "non-veg"]),
   description: zod.string().optional(),
 });
 
@@ -48,7 +46,6 @@ export const UpdateProductParams = zod.object({
 export const UpdateProductBody = zod.object({
   name: zod.string().optional(),
   price: zod.number().optional(),
-  type: zod.enum(["veg", "non-veg"]).optional(),
   description: zod.string().optional(),
 });
 
@@ -56,7 +53,6 @@ export const UpdateProductResponse = zod.object({
   id: zod.number(),
   name: zod.string(),
   price: zod.number(),
-  type: zod.enum(["veg", "non-veg"]),
   description: zod.string().nullable(),
   createdAt: zod.coerce.date(),
 });

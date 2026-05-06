@@ -10,6 +10,7 @@ import {
   UpdateProductResponse,
 } from "@workspace/api-zod";
 
+
 const router: IRouter = Router();
 
 router.get("/products", async (req, res): Promise<void> => {

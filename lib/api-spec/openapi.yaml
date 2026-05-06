@@ -485,9 +485,6 @@ components:
           type: string
         price:
           type: integer
-        type:
-          type: string
-          enum: [veg, non-veg]
         description:
           type: ["string", "null"]
         createdAt:
@@ -497,7 +494,6 @@ components:
         - id
         - name
         - price
-        - type
         - description
         - createdAt
 
@@ -508,15 +504,11 @@ components:
           type: string
         price:
           type: integer
-        type:
-          type: string
-          enum: [veg, non-veg]
         description:
           type: string
       required:
         - name
         - price
-        - type
 
     UpdateProductBody:
       type: object
@@ -525,9 +517,6 @@ components:
           type: string
         price:
           type: integer
-        type:
-          type: string
-          enum: [veg, non-veg]
         description:
           type: string
 

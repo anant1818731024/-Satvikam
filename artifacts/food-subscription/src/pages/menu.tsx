@@ -1,8 +1,7 @@
 import { useListProducts } from "@workspace/api-client-react";
 import { formatCurrency } from "@/lib/format";
-import { Badge } from "@/components/ui/badge";
 import { Skeleton } from "@/components/ui/skeleton";
-import { Coffee, Utensils } from "lucide-react";
+import { Utensils } from "lucide-react";
 
 export default function Menu() {
   const { data: products, isLoading, error } = useListProducts();
@@ -25,7 +24,6 @@ export default function Menu() {
               <Skeleton className="h-4 w-4/5 mb-6" />
               <div className="flex justify-between items-center mt-auto">
                 <Skeleton className="h-6 w-20" />
-                <Skeleton className="h-6 w-16" />
               </div>
             </div>
           ))}
@@ -43,12 +41,9 @@ export default function Menu() {
       ) : (
         <div className="grid md:grid-cols-2 lg:grid-cols-3 gap-6">
           {products?.map(product => (
-            <div key={product.id} className="border rounded-2xl p-6 bg-card hover:shadow-md transition-shadow flex flex-col">
-              <div className="flex justify-between items-start mb-4">
+            <div key={product.id} data-testid={`card-product-${product.id}`} className="border rounded-2xl p-6 bg-card hover:shadow-md transition-shadow flex flex-col">
+              <div className="mb-4">
                 <h3 className="text-xl font-bold font-serif">{product.name}</h3>
-                <Badge variant={product.type === "veg" ? "default" : "destructive"} className="uppercase tracking-wider text-[10px]">
-                  {product.type}
-                </Badge>
               </div>
               <p className="text-muted-foreground mb-6 flex-1 text-sm">
                 {product.description || "A delicious, freshly prepared meal."}
