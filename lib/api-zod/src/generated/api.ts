@@ -132,6 +132,7 @@ export const ListUsersResponseItem = zod.object({
   id: zod.number(),
   name: zod.string(),
   phone: zod.string(),
+  email: zod.string().nullable(),
   address: zod.string(),
   pincode: zod.string(),
   createdAt: zod.coerce.date(),
@@ -139,7 +140,7 @@ export const ListUsersResponseItem = zod.object({
 export const ListUsersResponse = zod.array(ListUsersResponseItem);
 
 /**
- * @summary Create a user
+ * @summary Create a user (admin/legacy)
  */
 export const CreateUserBody = zod.object({
   name: zod.string(),
@@ -147,6 +148,137 @@ export const CreateUserBody = zod.object({
   address: zod.string(),
   pincode: zod.string(),
 });
+
+/**
+ * @summary Create a new user account
+ */
+export const UserSignupBody = zod.object({
+  name: zod.string(),
+  phone: zod.string(),
+  email: zod.string().optional(),
+  password: zod.string(),
+  address: zod.string(),
+  pincode: zod.string(),
+});
+
+/**
+ * @summary Login with phone and password
+ */
+export const UserLoginBody = zod.object({
+  phone: zod.string(),
+  password: zod.string(),
+});
+
+export const UserLoginResponse = zod.object({
+  authenticated: zod.boolean(),
+  user: zod
+    .object({
+      id: zod.number(),
+      name: zod.string(),
+      phone: zod.string(),
+      email: zod.string().nullable(),
+      address: zod.string(),
+      pincode: zod.string(),
+      createdAt: zod.coerce.date(),
+    })
+    .optional(),
+});
+
+/**
+ * @summary Logout the current user
+ */
+export const UserLogoutResponse = zod.object({
+  authenticated: zod.boolean(),
+  user: zod
+    .object({
+      id: zod.number(),
+      name: zod.string(),
+      phone: zod.string(),
+      email: zod.string().nullable(),
+      address: zod.string(),
+      pincode: zod.string(),
+      createdAt: zod.coerce.date(),
+    })
+    .optional(),
+});
+
+/**
+ * @summary Get current user profile
+ */
+export const GetUserMeResponse = zod.object({
+  authenticated: zod.boolean(),
+  user: zod
+    .object({
+      id: zod.number(),
+      name: zod.string(),
+      phone: zod.string(),
+      email: zod.string().nullable(),
+      address: zod.string(),
+      pincode: zod.string(),
+      createdAt: zod.coerce.date(),
+    })
+    .optional(),
+});
+
+/**
+ * @summary Update current user profile
+ */
+export const UpdateUserMeBody = zod.object({
+  name: zod.string().optional(),
+  email: zod.string().optional(),
+  address: zod.string().optional(),
+  pincode: zod.string().optional(),
+});
+
+export const UpdateUserMeResponse = zod.object({
+  id: zod.number(),
+  name: zod.string(),
+  phone: zod.string(),
+  email: zod.string().nullable(),
+  address: zod.string(),
+  pincode: zod.string(),
+  createdAt: zod.coerce.date(),
+});
+
+/**
+ * @summary Get current user's orders
+ */
+export const GetMyOrdersResponseItem = zod.object({
+  id: zod.number(),
+  orderId: zod.string(),
+  userId: zod.number(),
+  planId: zod.number().nullable(),
+  productId: zod.number().nullable(),
+  type: zod.enum(["subscription", "single_item"]),
+  amount: zod.number(),
+  status: zod.enum(["pending", "paid"]),
+  deliveryStatus: zod.enum(["pending", "delivered"]),
+  paymentId: zod.string().nullable(),
+  userName: zod.string().nullable(),
+  planName: zod.string().nullable(),
+  productName: zod.string().nullable(),
+  createdAt: zod.coerce.date(),
+});
+export const GetMyOrdersResponse = zod.array(GetMyOrdersResponseItem);
+
+/**
+ * @summary Get current user's subscriptions
+ */
+export const GetMySubscriptionsResponseItem = zod.object({
+  id: zod.number(),
+  userId: zod.number(),
+  planId: zod.number(),
+  orderId: zod.string(),
+  startDate: zod.coerce.date(),
+  endDate: zod.coerce.date(),
+  status: zod.enum(["active", "inactive"]),
+  userName: zod.string().nullable(),
+  planName: zod.string().nullable(),
+  createdAt: zod.coerce.date(),
+});
+export const GetMySubscriptionsResponse = zod.array(
+  GetMySubscriptionsResponseItem,
+);
 
 /**
  * @summary List orders

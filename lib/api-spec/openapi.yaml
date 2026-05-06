@@ -218,7 +218,7 @@ paths:
               schema:
                 $ref: "#/components/schemas/ErrorResponse"
 
-  # Users
+  # Users (admin)
   /users:
     get:
       operationId: listUsers
@@ -236,7 +236,7 @@ paths:
     post:
       operationId: createUser
       tags: [users]
-      summary: Create a user
+      summary: Create a user (admin/legacy)
       requestBody:
         required: true
         content:
@@ -252,6 +252,148 @@ paths:
                 $ref: "#/components/schemas/User"
         "400":
           description: Validation error
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ErrorResponse"
+
+  # User auth
+  /users/signup:
+    post:
+      operationId: userSignup
+      tags: [users]
+      summary: Create a new user account
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/UserSignupBody"
+      responses:
+        "201":
+          description: Account created
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/UserAuthResponse"
+        "400":
+          description: Validation error or phone already taken
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ErrorResponse"
+
+  /users/login:
+    post:
+      operationId: userLogin
+      tags: [users]
+      summary: Login with phone and password
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/UserLoginBody"
+      responses:
+        "200":
+          description: Login successful
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/UserAuthResponse"
+        "401":
+          description: Invalid credentials
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ErrorResponse"
+
+  /users/logout:
+    post:
+      operationId: userLogout
+      tags: [users]
+      summary: Logout the current user
+      responses:
+        "200":
+          description: Logged out
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/UserAuthResponse"
+
+  /users/me:
+    get:
+      operationId: getUserMe
+      tags: [users]
+      summary: Get current user profile
+      responses:
+        "200":
+          description: Current user
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/UserAuthResponse"
+    patch:
+      operationId: updateUserMe
+      tags: [users]
+      summary: Update current user profile
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/UpdateUserProfileBody"
+      responses:
+        "200":
+          description: Updated profile
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/UserProfile"
+        "401":
+          description: Not authenticated
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ErrorResponse"
+
+  /users/me/orders:
+    get:
+      operationId: getMyOrders
+      tags: [users]
+      summary: Get current user's orders
+      responses:
+        "200":
+          description: User's orders
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: "#/components/schemas/Order"
+        "401":
+          description: Not authenticated
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ErrorResponse"
+
+  /users/me/subscriptions:
+    get:
+      operationId: getMySubscriptions
+      tags: [users]
+      summary: Get current user's subscriptions
+      responses:
+        "200":
+          description: User's subscriptions
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: "#/components/schemas/Subscription"
+        "401":
+          description: Not authenticated
           content:
             application/json:
               schema:
@@ -369,7 +511,6 @@ paths:
               schema:
                 $ref: "#/components/schemas/ErrorResponse"
 
-  # Orders by orderId string
   /orders/by-order-id/{orderId}:
     get:
       operationId: getOrderByOrderId
@@ -501,7 +642,7 @@ paths:
               schema:
                 $ref: "#/components/schemas/WebhookResponse"
 
-  # Admin summary
+  # Admin
   /admin/summary:
     get:
       operationId: getAdminSummary
@@ -704,6 +845,8 @@ components:
           type: string
         phone:
           type: string
+        email:
+          type: ["string", "null"]
         address:
           type: string
         pincode:
@@ -715,9 +858,92 @@ components:
         - id
         - name
         - phone
+        - email
         - address
         - pincode
         - createdAt
+
+    UserProfile:
+      type: object
+      properties:
+        id:
+          type: integer
+        name:
+          type: string
+        phone:
+          type: string
+        email:
+          type: ["string", "null"]
+        address:
+          type: string
+        pincode:
+          type: string
+        createdAt:
+          type: string
+          format: date-time
+      required:
+        - id
+        - name
+        - phone
+        - email
+        - address
+        - pincode
+        - createdAt
+
+    UserAuthResponse:
+      type: object
+      properties:
+        authenticated:
+          type: boolean
+        user:
+          $ref: "#/components/schemas/UserProfile"
+      required:
+        - authenticated
+
+    UserSignupBody:
+      type: object
+      properties:
+        name:
+          type: string
+        phone:
+          type: string
+        email:
+          type: string
+        password:
+          type: string
+        address:
+          type: string
+        pincode:
+          type: string
+      required:
+        - name
+        - phone
+        - password
+        - address
+        - pincode
+
+    UserLoginBody:
+      type: object
+      properties:
+        phone:
+          type: string
+        password:
+          type: string
+      required:
+        - phone
+        - password
+
+    UpdateUserProfileBody:
+      type: object
+      properties:
+        name:
+          type: string
+        email:
+          type: string
+        address:
+          type: string
+        pincode:
+          type: string
 
     CreateUserBody:
       type: object

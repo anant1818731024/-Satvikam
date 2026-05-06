@@ -11,6 +11,10 @@ import Menu from "@/pages/menu";
 import Subscription from "@/pages/subscription";
 import Subscribe from "@/pages/subscribe";
 import Success from "@/pages/success";
+import Login from "@/pages/login";
+import Signup from "@/pages/signup";
+import Account from "@/pages/account";
+import Support from "@/pages/support";
 
 import AdminLogin from "@/pages/admin/login";
 import AdminDashboard from "@/pages/admin/dashboard";
@@ -39,28 +43,14 @@ function AdminRoute({ component: Component }: { component: React.ComponentType }
 function AppRouter() {
   return (
     <Switch>
-      {/* Admin routes — login is public, all others require auth via AdminLayout */}
       <Route path="/admin/login" component={AdminLogin} />
-      <Route path="/admin/products">
-        {() => <AdminRoute component={AdminProducts} />}
-      </Route>
-      <Route path="/admin/plans">
-        {() => <AdminRoute component={AdminPlans} />}
-      </Route>
-      <Route path="/admin/orders">
-        {() => <AdminRoute component={AdminOrders} />}
-      </Route>
-      <Route path="/admin/subscriptions">
-        {() => <AdminRoute component={AdminSubscriptions} />}
-      </Route>
-      <Route path="/admin/delivery">
-        {() => <AdminRoute component={AdminDelivery} />}
-      </Route>
-      <Route path="/admin">
-        {() => <AdminRoute component={AdminDashboard} />}
-      </Route>
+      <Route path="/admin/products">{() => <AdminRoute component={AdminProducts} />}</Route>
+      <Route path="/admin/plans">{() => <AdminRoute component={AdminPlans} />}</Route>
+      <Route path="/admin/orders">{() => <AdminRoute component={AdminOrders} />}</Route>
+      <Route path="/admin/subscriptions">{() => <AdminRoute component={AdminSubscriptions} />}</Route>
+      <Route path="/admin/delivery">{() => <AdminRoute component={AdminDelivery} />}</Route>
+      <Route path="/admin">{() => <AdminRoute component={AdminDashboard} />}</Route>
 
-      {/* Public routes */}
       <Route path="/" nest>
         <Layout>
           <Switch>
@@ -69,6 +59,10 @@ function AppRouter() {
             <Route path="/subscription" component={Subscription} />
             <Route path="/subscribe" component={Subscribe} />
             <Route path="/success" component={Success} />
+            <Route path="/login" component={Login} />
+            <Route path="/signup" component={Signup} />
+            <Route path="/account" component={Account} />
+            <Route path="/support" component={Support} />
             <Route component={NotFound} />
           </Switch>
         </Layout>

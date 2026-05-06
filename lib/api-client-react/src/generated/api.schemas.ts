@@ -69,9 +69,48 @@ export interface User {
   id: number;
   name: string;
   phone: string;
+  /** @nullable */
+  email: string | null;
   address: string;
   pincode: string;
   createdAt: string;
+}
+
+export interface UserProfile {
+  id: number;
+  name: string;
+  phone: string;
+  /** @nullable */
+  email: string | null;
+  address: string;
+  pincode: string;
+  createdAt: string;
+}
+
+export interface UserAuthResponse {
+  authenticated: boolean;
+  user?: UserProfile;
+}
+
+export interface UserSignupBody {
+  name: string;
+  phone: string;
+  email?: string;
+  password: string;
+  address: string;
+  pincode: string;
+}
+
+export interface UserLoginBody {
+  phone: string;
+  password: string;
+}
+
+export interface UpdateUserProfileBody {
+  name?: string;
+  email?: string;
+  address?: string;
+  pincode?: string;
 }
 
 export interface CreateUserBody {

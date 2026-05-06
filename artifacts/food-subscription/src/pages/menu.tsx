@@ -1,6 +1,7 @@
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { useLocation } from "wouter";
-import { useListProducts, useCreateUser, useCreateOrder, useConfirmTestPayment } from "@workspace/api-client-react";
+import { useListProducts, useCreateOrder, useConfirmTestPayment } from "@workspace/api-client-react";
+import { useCurrentUser } from "@/hooks/use-current-user";
 import { formatCurrency } from "@/lib/format";
 import { Skeleton } from "@/components/ui/skeleton";
 import { Button } from "@/components/ui/button";
@@ -12,7 +13,7 @@ import {
   DialogHeader,
   DialogTitle,
 } from "@/components/ui/dialog";
-import { Utensils, ShoppingCart, Loader2 } from "lucide-react";
+import { Utensils, ShoppingCart, Loader2, LogIn } from "lucide-react";
 import { useToast } from "@/hooks/use-toast";
 
 type Product = {
@@ -25,26 +26,37 @@ type Product = {
 
 export default function Menu() {
   const { data: products, isLoading, error } = useListProducts();
+  const { user, isAuthenticated, isLoading: authLoading } = useCurrentUser();
   const [selectedProduct, setSelectedProduct] = useState<Product | null>(null);
-  const [formData, setFormData] = useState({ name: "", phone: "", address: "", pincode: "" });
+  const [address, setAddress] = useState("");
+  const [pincode, setPincode] = useState("");
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [, navigate] = useLocation();
   const { toast } = useToast();
 
-  const createUser = useCreateUser();
   const createOrder = useCreateOrder();
   const confirmPayment = useConfirmTestPayment();
 
-  const resetForm = () => setFormData({ name: "", phone: "", address: "", pincode: "" });
+  useEffect(() => {
+    if (user) {
+      setAddress(user.address);
+      setPincode(user.pincode);
+    }
+  }, [user]);
+
+  const handleCardClick = (product: Product) => {
+    if (!isAuthenticated) {
+      navigate("/login?redirect=/menu");
+      return;
+    }
+    setSelectedProduct(product);
+  };
 
   const handleBuy = async (e: React.FormEvent) => {
     e.preventDefault();
-    if (!selectedProduct) return;
+    if (!selectedProduct || !user) return;
     try {
       setIsSubmitting(true);
-
-      const user = await createUser.mutateAsync({ data: formData });
-
       const order = await createOrder.mutateAsync({
         data: {
           userId: user.id,
@@ -53,11 +65,8 @@ export default function Menu() {
           amount: selectedProduct.price,
         },
       });
-
       await confirmPayment.mutateAsync({ data: { orderId: order.orderId } });
-
       setSelectedProduct(null);
-      resetForm();
       navigate(`/success?orderId=${order.orderId}`);
     } catch {
       toast({ title: "Something went wrong", description: "Please try again.", variant: "destructive" });
@@ -70,13 +79,16 @@ export default function Menu() {
       <div className="max-w-3xl mb-12">
         <h1 className="text-4xl font-bold font-serif mb-4">Our Menu</h1>
         <p className="text-xl text-muted-foreground">
-          A glimpse into the kinds of wholesome, nourishing meals you'll receive. Click any item to order it directly.
+          Wholesome vegetarian meals prepared fresh daily.
+          {!authLoading && !isAuthenticated && (
+            <span className="text-primary font-medium cursor-pointer" onClick={() => navigate("/login?redirect=/menu")}> Sign in to order.</span>
+          )}
         </p>
       </div>
 
       {isLoading ? (
         <div className="grid md:grid-cols-2 lg:grid-cols-3 gap-6">
-          {[1, 2, 3, 4, 5, 6].map(i => (
+          {[1,2,3,4,5,6].map(i => (
             <div key={i} className="border rounded-2xl p-6 bg-card">
               <Skeleton className="h-6 w-2/3 mb-4" />
               <Skeleton className="h-4 w-full mb-2" />
@@ -101,29 +113,21 @@ export default function Menu() {
             <div
               key={product.id}
               className="border rounded-2xl bg-card hover:shadow-md transition-all cursor-pointer group flex flex-col overflow-hidden"
-              onClick={() => setSelectedProduct(product)}
+              onClick={() => handleCardClick(product)}
             >
               {product.imageUrl && (
                 <div className="h-48 overflow-hidden">
-                  <img
-                    src={product.imageUrl}
-                    alt={product.name}
-                    className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-300"
-                  />
+                  <img src={product.imageUrl} alt={product.name} className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-300" />
                 </div>
               )}
               <div className="p-6 flex flex-col flex-1">
                 <h3 className="text-xl font-bold font-serif mb-2">{product.name}</h3>
-                <p className="text-muted-foreground mb-4 flex-1 text-sm">
-                  {product.description || "A delicious, freshly prepared meal."}
-                </p>
+                <p className="text-muted-foreground mb-4 flex-1 text-sm">{product.description || "A delicious, freshly prepared meal."}</p>
                 <div className="flex items-center justify-between">
-                  <div className="font-mono text-lg font-bold text-primary">
-                    {formatCurrency(product.price)}
-                  </div>
+                  <div className="font-mono text-lg font-bold text-primary">{formatCurrency(product.price)}</div>
                   <div className="flex items-center gap-1.5 text-sm text-primary font-medium opacity-0 group-hover:opacity-100 transition-opacity">
-                    <ShoppingCart className="w-4 h-4" />
-                    Order Now
+                    {isAuthenticated ? <ShoppingCart className="w-4 h-4" /> : <LogIn className="w-4 h-4" />}
+                    {isAuthenticated ? "Order Now" : "Sign in"}
                   </div>
                 </div>
               </div>
@@ -132,7 +136,7 @@ export default function Menu() {
         </div>
       )}
 
-      <Dialog open={!!selectedProduct} onOpenChange={(open) => { if (!open) { setSelectedProduct(null); resetForm(); } }}>
+      <Dialog open={!!selectedProduct} onOpenChange={(open) => { if (!open) setSelectedProduct(null); }}>
         <DialogContent className="max-w-md">
           <DialogHeader>
             <DialogTitle className="font-serif text-xl">Order {selectedProduct?.name}</DialogTitle>
@@ -145,30 +149,16 @@ export default function Menu() {
                   <span className="font-medium">{selectedProduct.name}</span>
                   <span className="font-mono font-bold text-primary">{formatCurrency(selectedProduct.price)}</span>
                 </div>
-                {selectedProduct.description && (
-                  <p className="text-sm text-muted-foreground mt-1">{selectedProduct.description}</p>
-                )}
+                {selectedProduct.description && <p className="text-sm text-muted-foreground mt-1">{selectedProduct.description}</p>}
               </div>
 
-              <div className="grid grid-cols-2 gap-3">
-                <div className="space-y-1">
-                  <label className="text-sm font-medium">Full Name</label>
-                  <Input required placeholder="John Doe" value={formData.name} onChange={e => setFormData({ ...formData, name: e.target.value })} />
-                </div>
-                <div className="space-y-1">
-                  <label className="text-sm font-medium">Phone</label>
-                  <Input required placeholder="9999999999" value={formData.phone} onChange={e => setFormData({ ...formData, phone: e.target.value })} />
-                </div>
-              </div>
-
-              <div className="space-y-1">
+              <div className="space-y-1.5">
                 <label className="text-sm font-medium">Delivery Address</label>
-                <Textarea required placeholder="Flat No, Building, Street..." rows={2} className="resize-none" value={formData.address} onChange={e => setFormData({ ...formData, address: e.target.value })} />
+                <Textarea required rows={2} className="resize-none" value={address} onChange={e => setAddress(e.target.value)} placeholder="Flat No, Building, Street..." />
               </div>
-
-              <div className="space-y-1">
+              <div className="space-y-1.5">
                 <label className="text-sm font-medium">Pincode</label>
-                <Input required placeholder="110001" value={formData.pincode} onChange={e => setFormData({ ...formData, pincode: e.target.value })} />
+                <Input required value={pincode} onChange={e => setPincode(e.target.value)} placeholder="110001" />
               </div>
 
               <Button type="submit" className="w-full" disabled={isSubmitting}>

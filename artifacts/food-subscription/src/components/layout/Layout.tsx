@@ -1,5 +1,6 @@
 import { ReactNode } from "react";
 import { Navbar } from "./Navbar";
+import { WhatsAppButton } from "@/components/WhatsAppButton";
 
 export function Layout({ children }: { children: ReactNode }) {
   return (
@@ -19,6 +20,7 @@ export function Layout({ children }: { children: ReactNode }) {
           </p>
         </div>
       </footer>
+      <WhatsAppButton />
     </div>
   );
 }
