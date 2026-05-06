@@ -28,23 +28,39 @@ const queryClient = new QueryClient({
   },
 });
 
+function AdminRoute({ component: Component }: { component: React.ComponentType }) {
+  return (
+    <AdminLayout>
+      <Component />
+    </AdminLayout>
+  );
+}
+
 function AppRouter() {
   return (
     <Switch>
+      {/* Admin routes — login is public, all others require auth via AdminLayout */}
       <Route path="/admin/login" component={AdminLogin} />
-      <Route path="/admin" nest>
-        <AdminLayout>
-          <Switch>
-            <Route path="/" component={AdminDashboard} />
-            <Route path="/products" component={AdminProducts} />
-            <Route path="/plans" component={AdminPlans} />
-            <Route path="/orders" component={AdminOrders} />
-            <Route path="/subscriptions" component={AdminSubscriptions} />
-            <Route path="/delivery" component={AdminDelivery} />
-            <Route component={NotFound} />
-          </Switch>
-        </AdminLayout>
+      <Route path="/admin/products">
+        {() => <AdminRoute component={AdminProducts} />}
       </Route>
+      <Route path="/admin/plans">
+        {() => <AdminRoute component={AdminPlans} />}
+      </Route>
+      <Route path="/admin/orders">
+        {() => <AdminRoute component={AdminOrders} />}
+      </Route>
+      <Route path="/admin/subscriptions">
+        {() => <AdminRoute component={AdminSubscriptions} />}
+      </Route>
+      <Route path="/admin/delivery">
+        {() => <AdminRoute component={AdminDelivery} />}
+      </Route>
+      <Route path="/admin">
+        {() => <AdminRoute component={AdminDashboard} />}
+      </Route>
+
+      {/* Public routes */}
       <Route path="/" nest>
         <Layout>
           <Switch>
