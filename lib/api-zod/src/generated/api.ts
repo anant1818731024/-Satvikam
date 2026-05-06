@@ -23,6 +23,7 @@ export const ListProductsResponseItem = zod.object({
   name: zod.string(),
   price: zod.number(),
   description: zod.string().nullable(),
+  imageUrl: zod.string().nullable(),
   createdAt: zod.coerce.date(),
 });
 export const ListProductsResponse = zod.array(ListProductsResponseItem);
@@ -34,6 +35,7 @@ export const CreateProductBody = zod.object({
   name: zod.string(),
   price: zod.number(),
   description: zod.string().optional(),
+  imageUrl: zod.string().optional(),
 });
 
 /**
@@ -47,6 +49,7 @@ export const UpdateProductBody = zod.object({
   name: zod.string().optional(),
   price: zod.number().optional(),
   description: zod.string().optional(),
+  imageUrl: zod.string().optional(),
 });
 
 export const UpdateProductResponse = zod.object({
@@ -54,6 +57,7 @@ export const UpdateProductResponse = zod.object({
   name: zod.string(),
   price: zod.number(),
   description: zod.string().nullable(),
+  imageUrl: zod.string().nullable(),
   createdAt: zod.coerce.date(),
 });
 
@@ -149,18 +153,24 @@ export const CreateUserBody = zod.object({
  */
 export const ListOrdersQueryParams = zod.object({
   status: zod.enum(["pending", "paid"]).optional(),
+  type: zod.enum(["subscription", "single_item"]).optional(),
+  deliveryStatus: zod.enum(["pending", "delivered"]).optional(),
 });
 
 export const ListOrdersResponseItem = zod.object({
   id: zod.number(),
   orderId: zod.string(),
   userId: zod.number(),
-  planId: zod.number(),
+  planId: zod.number().nullable(),
+  productId: zod.number().nullable(),
+  type: zod.enum(["subscription", "single_item"]),
   amount: zod.number(),
   status: zod.enum(["pending", "paid"]),
+  deliveryStatus: zod.enum(["pending", "delivered"]),
   paymentId: zod.string().nullable(),
   userName: zod.string().nullable(),
   planName: zod.string().nullable(),
+  productName: zod.string().nullable(),
   createdAt: zod.coerce.date(),
 });
 export const ListOrdersResponse = zod.array(ListOrdersResponseItem);
@@ -170,7 +180,9 @@ export const ListOrdersResponse = zod.array(ListOrdersResponseItem);
  */
 export const CreateOrderBody = zod.object({
   userId: zod.number(),
-  planId: zod.number(),
+  planId: zod.number().optional(),
+  productId: zod.number().optional(),
+  type: zod.enum(["subscription", "single_item"]).optional(),
   amount: zod.number(),
 });
 
@@ -185,17 +197,21 @@ export const GetOrderResponse = zod.object({
   id: zod.number(),
   orderId: zod.string(),
   userId: zod.number(),
-  planId: zod.number(),
+  planId: zod.number().nullable(),
+  productId: zod.number().nullable(),
+  type: zod.enum(["subscription", "single_item"]),
   amount: zod.number(),
   status: zod.enum(["pending", "paid"]),
+  deliveryStatus: zod.enum(["pending", "delivered"]),
   paymentId: zod.string().nullable(),
   userName: zod.string().nullable(),
   planName: zod.string().nullable(),
+  productName: zod.string().nullable(),
   createdAt: zod.coerce.date(),
 });
 
 /**
- * @summary Update order status or payment info
+ * @summary Update order status, payment info, or delivery status
  */
 export const UpdateOrderParams = zod.object({
   id: zod.coerce.number(),
@@ -204,18 +220,47 @@ export const UpdateOrderParams = zod.object({
 export const UpdateOrderBody = zod.object({
   status: zod.enum(["pending", "paid"]).optional(),
   paymentId: zod.string().optional(),
+  deliveryStatus: zod.enum(["pending", "delivered"]).optional(),
 });
 
 export const UpdateOrderResponse = zod.object({
   id: zod.number(),
   orderId: zod.string(),
   userId: zod.number(),
-  planId: zod.number(),
+  planId: zod.number().nullable(),
+  productId: zod.number().nullable(),
+  type: zod.enum(["subscription", "single_item"]),
   amount: zod.number(),
   status: zod.enum(["pending", "paid"]),
+  deliveryStatus: zod.enum(["pending", "delivered"]),
   paymentId: zod.string().nullable(),
   userName: zod.string().nullable(),
   planName: zod.string().nullable(),
+  productName: zod.string().nullable(),
+  createdAt: zod.coerce.date(),
+});
+
+/**
+ * @summary Get an order by orderId string
+ */
+export const GetOrderByOrderIdParams = zod.object({
+  orderId: zod.coerce.string(),
+});
+
+export const GetOrderByOrderIdResponse = zod.object({
+  id: zod.number(),
+  orderId: zod.string(),
+  userId: zod.number(),
+  planId: zod.number().nullable(),
+  productId: zod.number().nullable(),
+  type: zod.enum(["subscription", "single_item"]),
+  amount: zod.number(),
+  status: zod.enum(["pending", "paid"]),
+  deliveryStatus: zod.enum(["pending", "delivered"]),
+  paymentId: zod.string().nullable(),
+  userName: zod.string().nullable(),
+  planName: zod.string().nullable(),
+  productName: zod.string().nullable(),
   createdAt: zod.coerce.date(),
 });
 
@@ -286,6 +331,17 @@ export const HandlePaymentWebhookResponse = zod.object({
 });
 
 /**
+ * @summary Confirm a test payment (dev only)
+ */
+export const ConfirmTestPaymentBody = zod.object({
+  orderId: zod.string(),
+});
+
+export const ConfirmTestPaymentResponse = zod.object({
+  success: zod.boolean(),
+});
+
+/**
  * @summary Get admin dashboard summary stats
  */
 export const GetAdminSummaryResponse = zod.object({
@@ -295,4 +351,30 @@ export const GetAdminSummaryResponse = zod.object({
   totalOrders: zod.number(),
   totalUsers: zod.number(),
   paidOrders: zod.number(),
+  pendingDeliveries: zod.number(),
+});
+
+/**
+ * @summary Admin login
+ */
+export const AdminLoginBody = zod.object({
+  password: zod.string(),
+});
+
+export const AdminLoginResponse = zod.object({
+  authenticated: zod.boolean(),
+});
+
+/**
+ * @summary Admin logout
+ */
+export const AdminLogoutResponse = zod.object({
+  authenticated: zod.boolean(),
+});
+
+/**
+ * @summary Check admin auth status
+ */
+export const GetAdminMeResponse = zod.object({
+  authenticated: zod.boolean(),
 });

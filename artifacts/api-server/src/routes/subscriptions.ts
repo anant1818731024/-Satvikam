@@ -1,5 +1,5 @@
 import { Router, type IRouter } from "express";
-import { eq } from "drizzle-orm";
+import { eq, lt } from "drizzle-orm";
 import { db, subscriptionsTable, usersTable, plansTable } from "@workspace/db";
 import {
   GetSubscriptionParams,
@@ -10,12 +10,22 @@ import {
 
 const router: IRouter = Router();
 
+async function expireStaleSubscriptions(): Promise<void> {
+  const now = new Date();
+  await db
+    .update(subscriptionsTable)
+    .set({ status: "inactive" })
+    .where(lt(subscriptionsTable.endDate, now));
+}
+
 router.get("/subscriptions", async (req, res): Promise<void> => {
   const queryParsed = ListSubscriptionsQueryParams.safeParse(req.query);
   if (!queryParsed.success) {
     res.status(400).json({ error: queryParsed.error.message });
     return;
   }
+
+  await expireStaleSubscriptions();
 
   const subs = await db
     .select({

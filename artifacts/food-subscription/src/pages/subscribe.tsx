@@ -1,9 +1,9 @@
-import { useState, useEffect } from "react";
+import { useState } from "react";
 import { useLocation } from "wouter";
 import { useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { z } from "zod";
-import { useListPlans, useCreateUser, useCreateOrder, useCreatePaymentOrder } from "@workspace/api-client-react";
+import { useListPlans, useCreateUser, useCreateOrder, useConfirmTestPayment } from "@workspace/api-client-react";
 import { formatCurrency } from "@/lib/format";
 
 import { Button } from "@/components/ui/button";
@@ -19,7 +19,7 @@ import { Input } from "@/components/ui/input";
 import { Textarea } from "@/components/ui/textarea";
 import { useToast } from "@/hooks/use-toast";
 import { Skeleton } from "@/components/ui/skeleton";
-import { ArrowRight, Loader2 } from "lucide-react";
+import { Loader2 } from "lucide-react";
 
 const formSchema = z.object({
   name: z.string().min(2, "Name must be at least 2 characters"),
@@ -34,15 +34,14 @@ export default function Subscribe() {
   const { toast } = useToast();
   const [isSubmitting, setIsSubmitting] = useState(false);
 
-  // Get plan from URL query if present
   const searchParams = new URLSearchParams(window.location.search);
   const initialPlanId = searchParams.get("plan");
 
   const { data: plans, isLoading: isLoadingPlans } = useListPlans();
-  
+
   const createUser = useCreateUser();
   const createOrder = useCreateOrder();
-  const createPaymentOrder = useCreatePaymentOrder();
+  const confirmPayment = useConfirmTestPayment();
 
   const form = useForm<z.infer<typeof formSchema>>({
     resolver: zodResolver(formSchema),
@@ -66,8 +65,7 @@ export default function Subscribe() {
 
     try {
       setIsSubmitting(true);
-      
-      // 1. Create User
+
       const user = await createUser.mutateAsync({ data: {
         name: values.name,
         phone: values.phone,
@@ -75,32 +73,24 @@ export default function Subscribe() {
         pincode: values.pincode,
       }});
 
-      // 2. Create Order
       const order = await createOrder.mutateAsync({ data: {
         userId: user.id,
         planId: selectedPlan.id,
+        type: "subscription",
         amount: selectedPlan.price,
       }});
 
-      // 3. Create Payment Order (simulating Razorpay)
-      const paymentOrder = await createPaymentOrder.mutateAsync({ data: {
-        orderId: order.orderId,
-        amount: order.amount,
-        phone: user.phone,
-      }});
+      await confirmPayment.mutateAsync({ data: { orderId: order.orderId } });
 
-      // Simulate payment success and redirect
-      // In a real app, this would open the Razorpay checkout modal
-      toast({ title: "Simulating payment...", description: "Redirecting to success page." });
-      
+      toast({ title: "Payment successful!", description: "Your subscription is now active." });
+
       setTimeout(() => {
         setLocation(`/success?orderId=${order.orderId}`);
-      }, 1000);
-      
+      }, 800);
+
     } catch (error) {
-      console.error(error);
-      toast({ 
-        title: "Something went wrong", 
+      toast({
+        title: "Something went wrong",
         description: "Could not process your subscription. Please try again.",
         variant: "destructive"
       });
@@ -119,7 +109,7 @@ export default function Subscribe() {
         <div>
           <div className="bg-card border rounded-2xl p-6 md:p-8">
             <h2 className="text-2xl font-serif font-bold mb-6">Delivery Details</h2>
-            
+
             <Form {...form}>
               <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-6">
                 <div className="grid grid-cols-2 gap-4">
@@ -195,7 +185,7 @@ export default function Subscribe() {
                       render={({ field }) => (
                         <FormItem className="space-y-3">
                           {plans?.map(plan => (
-                            <div 
+                            <div
                               key={plan.id}
                               className={`p-4 rounded-xl border-2 cursor-pointer transition-all ${
                                 field.value === plan.id ? "border-primary bg-primary/5" : "border-border hover:border-primary/30"
@@ -220,13 +210,14 @@ export default function Subscribe() {
                   )}
                 </div>
 
-                <Button 
-                  type="submit" 
-                  size="lg" 
-                  className="w-full text-lg h-14 rounded-xl mt-8" 
+                <Button
+                  type="submit"
+                  size="lg"
+                  className="w-full text-lg h-14 rounded-xl mt-8"
                   disabled={isSubmitting || !selectedPlanId}
                 >
-                  {isSubmitting ? <Loader2 className="mr-2 h-5 w-5 animate-spin" /> : "Pay with Razorpay"}
+                  {isSubmitting ? <Loader2 className="mr-2 h-5 w-5 animate-spin" /> : null}
+                  {isSubmitting ? "Processing..." : "Pay & Subscribe"}
                 </Button>
               </form>
             </Form>
@@ -236,7 +227,7 @@ export default function Subscribe() {
         <div>
           <div className="bg-primary/5 border border-primary/20 rounded-2xl p-6 sticky top-24">
             <h2 className="font-serif font-bold text-xl mb-4">Order Summary</h2>
-            
+
             {selectedPlan ? (
               <>
                 <div className="flex justify-between items-start mb-4 pb-4 border-b border-primary/10">

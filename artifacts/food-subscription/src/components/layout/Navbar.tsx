@@ -1,9 +1,13 @@
 import { Link, useLocation } from "wouter";
-import { Coffee, Utensils, Calendar, Settings } from "lucide-react";
 import { Button } from "@/components/ui/button";
 
 export function Navbar() {
   const [location] = useLocation();
+
+  const navLinks = [
+    { href: "/menu", label: "Menu" },
+    { href: "/subscription", label: "Plans" },
+  ];
 
   return (
     <header className="border-b bg-background sticky top-0 z-50">
@@ -15,31 +19,21 @@ export function Navbar() {
           <span className="font-serif font-bold text-xl text-foreground">Saffron.</span>
         </Link>
         <nav className="hidden md:flex items-center gap-8">
-          <Link
-            href="/menu"
-            className={`text-sm font-medium transition-colors hover:text-primary ${
-              location === "/menu" ? "text-primary" : "text-muted-foreground"
-            }`}
-          >
-            Menu
-          </Link>
-          <Link
-            href="/subscription"
-            className={`text-sm font-medium transition-colors hover:text-primary ${
-              location === "/subscription" ? "text-primary" : "text-muted-foreground"
-            }`}
-          >
-            Plans
-          </Link>
+          {navLinks.map((link) => (
+            <Link
+              key={link.href}
+              href={link.href}
+              className={`text-sm font-medium transition-colors hover:text-primary ${
+                location === link.href ? "text-primary" : "text-muted-foreground"
+              }`}
+            >
+              {link.label}
+            </Link>
+          ))}
         </nav>
-        <div className="flex items-center gap-4">
-          <Button asChild variant="outline" className="hidden sm:inline-flex border-primary/20 text-primary hover:bg-primary/5 hover:text-primary">
-            <Link href="/admin">Admin</Link>
-          </Button>
-          <Button asChild className="font-semibold shadow-sm">
-            <Link href="/subscription">Subscribe</Link>
-          </Button>
-        </div>
+        <Button asChild className="font-semibold shadow-sm">
+          <Link href="/subscription">Subscribe</Link>
+        </Button>
       </div>
     </header>
   );

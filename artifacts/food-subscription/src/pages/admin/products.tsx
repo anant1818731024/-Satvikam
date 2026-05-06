@@ -23,6 +23,13 @@ import {
 import { Plus, Edit2, Trash2, Loader2 } from "lucide-react";
 import { useToast } from "@/hooks/use-toast";
 
+type ProductForm = {
+  name: string;
+  price: string;
+  description: string;
+  imageUrl: string;
+};
+
 export default function AdminProducts() {
   const { data: products, isLoading } = useListProducts();
   const [isCreateOpen, setIsCreateOpen] = useState(false);
@@ -35,22 +42,24 @@ export default function AdminProducts() {
   const updateProduct = useUpdateProduct();
   const deleteProduct = useDeleteProduct();
 
-  const [formData, setFormData] = useState({
+  const [formData, setFormData] = useState<ProductForm>({
     name: "",
     price: "",
     description: "",
+    imageUrl: "",
   });
 
   const resetForm = () => {
-    setFormData({ name: "", price: "", description: "" });
+    setFormData({ name: "", price: "", description: "", imageUrl: "" });
     setEditingId(null);
   };
 
-  const handleEdit = (product: { id: number; name: string; price: number; description: string | null }) => {
+  const handleEdit = (product: { id: number; name: string; price: number; description: string | null; imageUrl: string | null }) => {
     setFormData({
       name: product.name,
       price: (product.price / 100).toString(),
       description: product.description || "",
+      imageUrl: product.imageUrl || "",
     });
     setEditingId(product.id);
     setIsCreateOpen(true);
@@ -73,7 +82,8 @@ export default function AdminProducts() {
       const payload = {
         name: formData.name,
         price: Math.round(parseFloat(formData.price) * 100),
-        description: formData.description,
+        description: formData.description || undefined,
+        imageUrl: formData.imageUrl || undefined,
       };
 
       if (editingId) {
@@ -115,13 +125,23 @@ export default function AdminProducts() {
               </div>
 
               <div className="space-y-2">
-                <label className="text-sm font-medium">Price (INR)</label>
+                <label className="text-sm font-medium">Price (₹)</label>
                 <Input type="number" step="0.01" required value={formData.price} onChange={e => setFormData({...formData, price: e.target.value})} placeholder="150.00" />
               </div>
 
               <div className="space-y-2">
                 <label className="text-sm font-medium">Description</label>
-                <Textarea value={formData.description} onChange={e => setFormData({...formData, description: e.target.value})} placeholder="Brief description..." rows={3} />
+                <Textarea value={formData.description} onChange={e => setFormData({...formData, description: e.target.value})} placeholder="Brief description..." rows={2} />
+              </div>
+
+              <div className="space-y-2">
+                <label className="text-sm font-medium">Image URL <span className="text-muted-foreground font-normal">(optional)</span></label>
+                <Input value={formData.imageUrl} onChange={e => setFormData({...formData, imageUrl: e.target.value})} placeholder="https://example.com/image.jpg" />
+                {formData.imageUrl && (
+                  <div className="mt-2 rounded-lg overflow-hidden border h-32">
+                    <img src={formData.imageUrl} alt="Preview" className="w-full h-full object-cover" onError={(e) => { (e.target as HTMLImageElement).style.display = "none"; }} />
+                  </div>
+                )}
               </div>
 
               <Button type="submit" className="w-full" disabled={createProduct.isPending || updateProduct.isPending}>
@@ -137,6 +157,7 @@ export default function AdminProducts() {
         <Table>
           <TableHeader>
             <TableRow>
+              <TableHead>Image</TableHead>
               <TableHead>Name</TableHead>
               <TableHead>Description</TableHead>
               <TableHead>Price</TableHead>
@@ -146,17 +167,24 @@ export default function AdminProducts() {
           <TableBody>
             {isLoading ? (
               <TableRow>
-                <TableCell colSpan={4} className="text-center py-8">Loading products...</TableCell>
+                <TableCell colSpan={5} className="text-center py-8">Loading products...</TableCell>
               </TableRow>
             ) : products?.length === 0 ? (
               <TableRow>
-                <TableCell colSpan={4} className="text-center py-8 text-muted-foreground">No products found.</TableCell>
+                <TableCell colSpan={5} className="text-center py-8 text-muted-foreground">No products found.</TableCell>
               </TableRow>
             ) : (
               products?.map((product) => (
-                <TableRow key={product.id} data-testid={`row-product-${product.id}`}>
+                <TableRow key={product.id}>
+                  <TableCell>
+                    {product.imageUrl ? (
+                      <img src={product.imageUrl} alt={product.name} className="w-12 h-12 rounded-lg object-cover border" />
+                    ) : (
+                      <div className="w-12 h-12 rounded-lg bg-muted flex items-center justify-center text-muted-foreground text-xs">No img</div>
+                    )}
+                  </TableCell>
                   <TableCell className="font-medium">{product.name}</TableCell>
-                  <TableCell className="text-muted-foreground text-sm">{product.description || "—"}</TableCell>
+                  <TableCell className="text-muted-foreground text-sm max-w-xs truncate">{product.description || "—"}</TableCell>
                   <TableCell className="font-mono">{formatCurrency(product.price)}</TableCell>
                   <TableCell className="text-right space-x-2">
                     <Button variant="ghost" size="icon" onClick={() => handleEdit(product)}>

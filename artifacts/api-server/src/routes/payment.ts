@@ -1,7 +1,7 @@
 import { Router, type IRouter } from "express";
 import { eq } from "drizzle-orm";
 import { db, ordersTable, subscriptionsTable, plansTable } from "@workspace/db";
-import { CreatePaymentOrderBody } from "@workspace/api-zod";
+import { CreatePaymentOrderBody, ConfirmTestPaymentBody } from "@workspace/api-zod";
 import { logger } from "../lib/logger";
 
 const router: IRouter = Router();
@@ -18,7 +18,6 @@ router.post("/payment/create-order", async (req, res): Promise<void> => {
   req.log.info({ orderId, phone }, "Creating payment order");
 
   // Stub Razorpay integration — keys not yet configured
-  // When RAZORPAY_KEY_ID and RAZORPAY_KEY_SECRET are set, replace with real Razorpay SDK call
   const razorpayOrderId = `rzp_${Date.now()}_${Math.random().toString(36).substring(2, 8)}`;
 
   res.json({
@@ -31,13 +30,6 @@ router.post("/payment/create-order", async (req, res): Promise<void> => {
 
 router.post("/payment/webhook", async (req, res): Promise<void> => {
   req.log.info("Payment webhook received");
-
-  // When Razorpay keys are configured, verify HMAC-SHA256 signature:
-  // const signature = req.headers['x-razorpay-signature'];
-  // const body = JSON.stringify(req.body);
-  // const expectedSig = crypto.createHmac('sha256', process.env.RAZORPAY_WEBHOOK_SECRET!)
-  //   .update(body).digest('hex');
-  // if (signature !== expectedSig) { res.status(400).json({ error: 'Invalid signature' }); return; }
 
   const event = req.body;
 
@@ -53,7 +45,7 @@ router.post("/payment/webhook", async (req, res): Promise<void> => {
         .where(eq(ordersTable.orderId, orderIdStr))
         .returning();
 
-      if (order) {
+      if (order && order.planId) {
         const [plan] = await db.select().from(plansTable).where(eq(plansTable.id, order.planId));
         if (plan) {
           const startDate = new Date();
@@ -80,11 +72,13 @@ router.post("/payment/webhook", async (req, res): Promise<void> => {
 
 // Manual payment confirm endpoint for testing (when Razorpay is not yet configured)
 router.post("/payment/confirm-test", async (req, res): Promise<void> => {
-  const { orderId } = req.body as { orderId: string };
-  if (!orderId) {
+  const parsed = ConfirmTestPaymentBody.safeParse(req.body);
+  if (!parsed.success) {
     res.status(400).json({ error: "orderId required" });
     return;
   }
+
+  const { orderId } = parsed.data;
 
   const [order] = await db
     .update(ordersTable)
@@ -97,24 +91,27 @@ router.post("/payment/confirm-test", async (req, res): Promise<void> => {
     return;
   }
 
-  const [plan] = await db.select().from(plansTable).where(eq(plansTable.id, order.planId));
-  if (plan) {
-    const startDate = new Date();
-    const endDate = new Date(startDate);
-    endDate.setDate(endDate.getDate() + plan.durationDays);
+  // Only create subscription if this is a subscription-type order with a plan
+  if (order.type === "subscription" && order.planId) {
+    const [plan] = await db.select().from(plansTable).where(eq(plansTable.id, order.planId));
+    if (plan) {
+      const startDate = new Date();
+      const endDate = new Date(startDate);
+      endDate.setDate(endDate.getDate() + plan.durationDays);
 
-    await db.insert(subscriptionsTable).values({
-      userId: order.userId,
-      planId: order.planId,
-      orderId: order.orderId,
-      startDate,
-      endDate,
-      status: "active",
-    });
+      await db.insert(subscriptionsTable).values({
+        userId: order.userId,
+        planId: order.planId,
+        orderId: order.orderId,
+        startDate,
+        endDate,
+        status: "active",
+      });
+    }
   }
 
   logger.info({ orderId }, "Test payment confirmed");
-  res.json({ success: true, orderId });
+  res.json({ success: true });
 });
 
 export default router;

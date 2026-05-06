@@ -7,6 +7,7 @@ export const productsTable = pgTable("products", {
   name: text("name").notNull(),
   price: integer("price").notNull(),
   description: text("description"),
+  imageUrl: text("image_url"),
   createdAt: timestamp("created_at", { withTimezone: true }).notNull().defaultNow(),
 });
 

@@ -19,6 +19,8 @@ export interface Product {
   price: number;
   /** @nullable */
   description: string | null;
+  /** @nullable */
+  imageUrl: string | null;
   createdAt: string;
 }
 
@@ -26,12 +28,14 @@ export interface CreateProductBody {
   name: string;
   price: number;
   description?: string;
+  imageUrl?: string;
 }
 
 export interface UpdateProductBody {
   name?: string;
   price?: number;
   description?: string;
+  imageUrl?: string;
 }
 
 export interface Plan {
@@ -77,6 +81,13 @@ export interface CreateUserBody {
   pincode: string;
 }
 
+export type OrderType = (typeof OrderType)[keyof typeof OrderType];
+
+export const OrderType = {
+  subscription: "subscription",
+  single_item: "single_item",
+} as const;
+
 export type OrderStatus = (typeof OrderStatus)[keyof typeof OrderStatus];
 
 export const OrderStatus = {
@@ -84,25 +95,50 @@ export const OrderStatus = {
   paid: "paid",
 } as const;
 
+export type OrderDeliveryStatus =
+  (typeof OrderDeliveryStatus)[keyof typeof OrderDeliveryStatus];
+
+export const OrderDeliveryStatus = {
+  pending: "pending",
+  delivered: "delivered",
+} as const;
+
 export interface Order {
   id: number;
   orderId: string;
   userId: number;
-  planId: number;
+  /** @nullable */
+  planId: number | null;
+  /** @nullable */
+  productId: number | null;
+  type: OrderType;
   amount: number;
   status: OrderStatus;
+  deliveryStatus: OrderDeliveryStatus;
   /** @nullable */
   paymentId: string | null;
   /** @nullable */
   userName: string | null;
   /** @nullable */
   planName: string | null;
+  /** @nullable */
+  productName: string | null;
   createdAt: string;
 }
 
+export type CreateOrderBodyType =
+  (typeof CreateOrderBodyType)[keyof typeof CreateOrderBodyType];
+
+export const CreateOrderBodyType = {
+  subscription: "subscription",
+  single_item: "single_item",
+} as const;
+
 export interface CreateOrderBody {
   userId: number;
-  planId: number;
+  planId?: number;
+  productId?: number;
+  type?: CreateOrderBodyType;
   amount: number;
 }
 
@@ -114,9 +150,18 @@ export const UpdateOrderBodyStatus = {
   paid: "paid",
 } as const;
 
+export type UpdateOrderBodyDeliveryStatus =
+  (typeof UpdateOrderBodyDeliveryStatus)[keyof typeof UpdateOrderBodyDeliveryStatus];
+
+export const UpdateOrderBodyDeliveryStatus = {
+  pending: "pending",
+  delivered: "delivered",
+} as const;
+
 export interface UpdateOrderBody {
   status?: UpdateOrderBodyStatus;
   paymentId?: string;
+  deliveryStatus?: UpdateOrderBodyDeliveryStatus;
 }
 
 export type SubscriptionStatus =
@@ -148,6 +193,10 @@ export interface CreatePaymentOrderBody {
   phone: string;
 }
 
+export interface ConfirmTestPaymentBody {
+  orderId: string;
+}
+
 export interface PaymentOrder {
   razorpayOrderId: string;
   amount: number;
@@ -166,10 +215,21 @@ export interface AdminSummary {
   totalOrders: number;
   totalUsers: number;
   paidOrders: number;
+  pendingDeliveries: number;
+}
+
+export interface AdminLoginBody {
+  password: string;
+}
+
+export interface AdminAuthResponse {
+  authenticated: boolean;
 }
 
 export type ListOrdersParams = {
   status?: ListOrdersStatus;
+  type?: ListOrdersType;
+  deliveryStatus?: ListOrdersDeliveryStatus;
 };
 
 export type ListOrdersStatus =
@@ -178,6 +238,22 @@ export type ListOrdersStatus =
 export const ListOrdersStatus = {
   pending: "pending",
   paid: "paid",
+} as const;
+
+export type ListOrdersType =
+  (typeof ListOrdersType)[keyof typeof ListOrdersType];
+
+export const ListOrdersType = {
+  subscription: "subscription",
+  single_item: "single_item",
+} as const;
+
+export type ListOrdersDeliveryStatus =
+  (typeof ListOrdersDeliveryStatus)[keyof typeof ListOrdersDeliveryStatus];
+
+export const ListOrdersDeliveryStatus = {
+  pending: "pending",
+  delivered: "delivered",
 } as const;
 
 export type ListSubscriptionsParams = {

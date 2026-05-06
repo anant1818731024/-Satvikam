@@ -18,23 +18,28 @@ import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@
 
 export default function AdminOrders() {
   const [statusFilter, setStatusFilter] = useState<"all" | "pending" | "paid">("all");
-  
-  const queryParams = statusFilter === "all" ? {} : { status: statusFilter };
-  const { data: orders, isLoading } = useListOrders({ query: queryParams });
-  
+  const [typeFilter, setTypeFilter] = useState<"all" | "subscription" | "single_item">("all");
+
+  const orderParams = {
+    ...(statusFilter !== "all" ? { status: statusFilter } : {}),
+    ...(typeFilter !== "all" ? { type: typeFilter } : {}),
+  };
+
+  const { data: orders, isLoading } = useListOrders(orderParams);
+
   const updateOrder = useUpdateOrder();
   const queryClient = useQueryClient();
   const { toast } = useToast();
 
   const handleMarkPaid = async (id: number) => {
     try {
-      await updateOrder.mutateAsync({ 
-        id, 
-        data: { status: "paid", paymentId: `MANUAL-${Math.floor(Math.random()*10000)}` } 
+      await updateOrder.mutateAsync({
+        id,
+        data: { status: "paid", paymentId: `MANUAL-${Math.floor(Math.random() * 10000)}` }
       });
       queryClient.invalidateQueries({ queryKey: getListOrdersQueryKey() });
       toast({ title: "Order marked as paid" });
-    } catch (err) {
+    } catch {
       toast({ title: "Error", description: "Failed to update order", variant: "destructive" });
     }
   };
@@ -44,16 +49,27 @@ export default function AdminOrders() {
       <div className="flex justify-between items-end">
         <div>
           <h1 className="text-3xl font-bold font-serif text-foreground">Orders</h1>
-          <p className="text-muted-foreground mt-1">Track and manage customer payments and orders.</p>
+          <p className="text-muted-foreground mt-1">Track and manage all customer orders.</p>
         </div>
-        
-        <div className="w-48">
+
+        <div className="flex gap-3">
+          <Select value={typeFilter} onValueChange={(val: any) => setTypeFilter(val)}>
+            <SelectTrigger className="w-44">
+              <SelectValue placeholder="Filter by type" />
+            </SelectTrigger>
+            <SelectContent>
+              <SelectItem value="all">All Types</SelectItem>
+              <SelectItem value="subscription">Subscription</SelectItem>
+              <SelectItem value="single_item">Single Item</SelectItem>
+            </SelectContent>
+          </Select>
+
           <Select value={statusFilter} onValueChange={(val: any) => setStatusFilter(val)}>
-            <SelectTrigger>
+            <SelectTrigger className="w-40">
               <SelectValue placeholder="Filter by status" />
             </SelectTrigger>
             <SelectContent>
-              <SelectItem value="all">All Orders</SelectItem>
+              <SelectItem value="all">All Status</SelectItem>
               <SelectItem value="pending">Pending</SelectItem>
               <SelectItem value="paid">Paid</SelectItem>
             </SelectContent>
@@ -68,20 +84,22 @@ export default function AdminOrders() {
               <TableHead>Order ID</TableHead>
               <TableHead>Date</TableHead>
               <TableHead>Customer</TableHead>
-              <TableHead>Plan</TableHead>
+              <TableHead>Item</TableHead>
+              <TableHead>Type</TableHead>
               <TableHead>Amount</TableHead>
               <TableHead>Status</TableHead>
+              <TableHead>Delivery</TableHead>
               <TableHead className="text-right">Actions</TableHead>
             </TableRow>
           </TableHeader>
           <TableBody>
             {isLoading ? (
               <TableRow>
-                <TableCell colSpan={7} className="text-center py-8">Loading orders...</TableCell>
+                <TableCell colSpan={9} className="text-center py-8">Loading orders...</TableCell>
               </TableRow>
             ) : orders?.length === 0 ? (
               <TableRow>
-                <TableCell colSpan={7} className="text-center py-8 text-muted-foreground">No orders found.</TableCell>
+                <TableCell colSpan={9} className="text-center py-8 text-muted-foreground">No orders found.</TableCell>
               </TableRow>
             ) : (
               orders?.map((order) => (
@@ -89,11 +107,26 @@ export default function AdminOrders() {
                   <TableCell className="font-mono text-xs">{order.orderId}</TableCell>
                   <TableCell className="text-sm">{format(new Date(order.createdAt), "MMM d, yyyy")}</TableCell>
                   <TableCell className="font-medium">{order.userName || `User #${order.userId}`}</TableCell>
-                  <TableCell>{order.planName || `Plan #${order.planId}`}</TableCell>
+                  <TableCell className="text-sm">
+                    {order.type === "single_item"
+                      ? (order.productName || `Item #${order.productId}`)
+                      : (order.planName || `Plan #${order.planId}`)
+                    }
+                  </TableCell>
+                  <TableCell>
+                    <Badge variant="outline" className="text-xs capitalize">
+                      {order.type === "single_item" ? "Single Item" : "Subscription"}
+                    </Badge>
+                  </TableCell>
                   <TableCell className="font-mono">{formatCurrency(order.amount)}</TableCell>
                   <TableCell>
                     <Badge variant={order.status === "paid" ? "default" : "secondary"} className={order.status === "paid" ? "bg-accent hover:bg-accent/80 text-accent-foreground" : ""}>
                       {order.status}
+                    </Badge>
+                  </TableCell>
+                  <TableCell>
+                    <Badge variant={order.deliveryStatus === "delivered" ? "default" : "outline"} className={order.deliveryStatus === "delivered" ? "bg-green-600 text-white" : "text-amber-600 border-amber-300"}>
+                      {order.deliveryStatus}
                     </Badge>
                   </TableCell>
                   <TableCell className="text-right">

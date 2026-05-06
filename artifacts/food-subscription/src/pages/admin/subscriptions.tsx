@@ -14,7 +14,7 @@ import {
 
 export default function AdminSubscriptions() {
   const [activeTab, setActiveTab] = useState<"active" | "inactive">("active");
-  const { data: subscriptions, isLoading } = useListSubscriptions({ query: { status: activeTab } });
+  const { data: subscriptions, isLoading } = useListSubscriptions({ status: activeTab });
 
   return (
     <div className="space-y-8">

@@ -12,17 +12,26 @@ import Subscription from "@/pages/subscription";
 import Subscribe from "@/pages/subscribe";
 import Success from "@/pages/success";
 
+import AdminLogin from "@/pages/admin/login";
 import AdminDashboard from "@/pages/admin/dashboard";
 import AdminProducts from "@/pages/admin/products";
 import AdminPlans from "@/pages/admin/plans";
 import AdminOrders from "@/pages/admin/orders";
 import AdminSubscriptions from "@/pages/admin/subscriptions";
+import AdminDelivery from "@/pages/admin/delivery";
 
-const queryClient = new QueryClient();
+const queryClient = new QueryClient({
+  defaultOptions: {
+    queries: {
+      retry: false,
+    },
+  },
+});
 
 function AppRouter() {
   return (
     <Switch>
+      <Route path="/admin/login" component={AdminLogin} />
       <Route path="/admin" nest>
         <AdminLayout>
           <Switch>
@@ -31,6 +40,7 @@ function AppRouter() {
             <Route path="/plans" component={AdminPlans} />
             <Route path="/orders" component={AdminOrders} />
             <Route path="/subscriptions" component={AdminSubscriptions} />
+            <Route path="/delivery" component={AdminDelivery} />
             <Route component={NotFound} />
           </Switch>
         </AdminLayout>
