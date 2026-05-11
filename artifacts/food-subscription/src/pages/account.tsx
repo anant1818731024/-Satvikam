@@ -1,6 +1,6 @@
 import { useEffect, useState } from "react";
 import { useLocation } from "wouter";
-import { useGetMyOrders, useGetMySubscriptions, useUpdateUserMe, getUserMeQueryKey } from "@workspace/api-client-react";
+import { useGetMyOrders, useGetMySubscriptions, useUpdateUserMe, getGetUserMeQueryKey } from "@workspace/api-client-react";
 import { useCurrentUser } from "@/hooks/use-current-user";
 import { useQueryClient } from "@tanstack/react-query";
 import { formatCurrency } from "@/lib/format";
@@ -44,7 +44,7 @@ export default function Account() {
     e.preventDefault();
     try {
       await updateProfile.mutateAsync({ data: profileForm });
-      queryClient.invalidateQueries({ queryKey: getUserMeQueryKey() });
+      queryClient.invalidateQueries({ queryKey: getGetUserMeQueryKey() });
       toast({ title: "Profile updated" });
     } catch {
       toast({ title: "Failed to update profile", variant: "destructive" });

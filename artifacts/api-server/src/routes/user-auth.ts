@@ -2,7 +2,7 @@ import { Router, type IRouter, type Request, type Response, type NextFunction } 
 import bcrypt from "bcryptjs";
 import { eq } from "drizzle-orm";
 import { db, usersTable, ordersTable, subscriptionsTable, plansTable, productsTable } from "@workspace/db";
-import { UserSignupBody, UserLoginBody, UpdateUserProfileBody } from "@workspace/api-zod";
+import { UserSignupBody, UserLoginBody, UpdateUserMeBody } from "@workspace/api-zod";
 
 const router: IRouter = Router();
 
@@ -101,7 +101,7 @@ router.get("/users/me", async (req, res): Promise<void> => {
 });
 
 router.patch("/users/me", requireUser, async (req, res): Promise<void> => {
-  const parsed = UpdateUserProfileBody.safeParse(req.body);
+  const parsed = UpdateUserMeBody.safeParse(req.body);
   if (!parsed.success) {
     res.status(400).json({ error: "Invalid data" });
     return;
