@@ -1,7 +1,10 @@
+import { useState } from "react";
 import { Link, useLocation } from "wouter";
-import { LayoutDashboard, Package, Coffee, ShoppingBag, CalendarClock, Home, Truck, LogOut, Shield } from "lucide-react";
+import { LayoutDashboard, Package, Coffee, ShoppingBag, CalendarClock, Home, Truck, LogOut, Shield, Menu } from "lucide-react";
 import { useAdminLogout } from "@workspace/api-client-react";
 import { useQueryClient } from "@tanstack/react-query";
+import { Sheet, SheetContent } from "@/components/ui/sheet";
+import { Button } from "@/components/ui/button";
 
 const links = [
   { href: "/admin", label: "Dashboard", icon: LayoutDashboard },
@@ -13,19 +16,13 @@ const links = [
   { href: "/admin/security", label: "Security", icon: Shield },
 ];
 
-export function AdminSidebar() {
-  const [location, navigate] = useLocation();
-  const queryClient = useQueryClient();
-  const logout = useAdminLogout();
-
-  const handleLogout = async () => {
-    await logout.mutateAsync();
-    queryClient.clear();
-    navigate("/admin/login");
-  };
-
+function NavItems({ location, onNavigate, handleLogout }: {
+  location: string;
+  onNavigate?: () => void;
+  handleLogout: () => void;
+}) {
   return (
-    <aside className="w-64 border-r bg-sidebar h-[100dvh] flex flex-col sticky top-0">
+    <div className="flex flex-col h-full">
       <div className="p-6 border-b border-sidebar-border">
         <div className="flex items-center gap-2 mb-2">
           <div className="w-8 h-8 bg-primary text-primary-foreground rounded-full flex items-center justify-center font-bold font-serif text-lg">
@@ -42,6 +39,7 @@ export function AdminSidebar() {
             <Link
               key={link.href}
               href={link.href}
+              onClick={onNavigate}
               className={`flex items-center gap-3 px-3 py-2.5 rounded-md text-sm font-medium transition-colors ${
                 active
                   ? "bg-sidebar-accent text-sidebar-accent-foreground"
@@ -57,6 +55,7 @@ export function AdminSidebar() {
       <div className="p-4 border-t border-sidebar-border space-y-1">
         <Link
           href="/"
+          onClick={onNavigate}
           className="flex items-center gap-3 px-3 py-2.5 rounded-md text-sm font-medium text-sidebar-foreground/70 hover:bg-sidebar-accent/50 hover:text-sidebar-foreground transition-colors"
         >
           <Home className="w-4 h-4" />
@@ -70,6 +69,53 @@ export function AdminSidebar() {
           Logout
         </button>
       </div>
-    </aside>
+    </div>
+  );
+}
+
+export function AdminSidebar() {
+  const [location, navigate] = useLocation();
+  const [mobileOpen, setMobileOpen] = useState(false);
+  const queryClient = useQueryClient();
+  const logout = useAdminLogout();
+
+  const handleLogout = async () => {
+    await logout.mutateAsync();
+    queryClient.clear();
+    navigate("/admin/login");
+  };
+
+  return (
+    <>
+      {/* Mobile top bar */}
+      <header className="md:hidden sticky top-0 z-40 flex items-center gap-3 px-4 h-14 border-b bg-sidebar border-sidebar-border shrink-0">
+        <Button variant="ghost" size="icon" onClick={() => setMobileOpen(true)}>
+          <Menu className="w-5 h-5" />
+        </Button>
+        <div className="flex items-center gap-2">
+          <div className="w-7 h-7 bg-primary text-primary-foreground rounded-full flex items-center justify-center font-bold font-serif">
+            S
+          </div>
+          <span className="font-serif font-bold text-lg text-sidebar-foreground">Saffron.</span>
+        </div>
+        <span className="text-xs text-sidebar-foreground/60 font-medium">Admin</span>
+      </header>
+
+      {/* Mobile Sheet */}
+      <Sheet open={mobileOpen} onOpenChange={setMobileOpen}>
+        <SheetContent side="left" className="p-0 w-64 bg-sidebar">
+          <NavItems
+            location={location}
+            onNavigate={() => setMobileOpen(false)}
+            handleLogout={handleLogout}
+          />
+        </SheetContent>
+      </Sheet>
+
+      {/* Desktop sidebar */}
+      <aside className="hidden md:flex md:flex-col w-64 border-r bg-sidebar h-[100dvh] sticky top-0 shrink-0">
+        <NavItems location={location} handleLogout={handleLogout} />
+      </aside>
+    </>
   );
 }

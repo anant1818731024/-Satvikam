@@ -99,16 +99,16 @@ export default function AdminPlans() {
   };
 
   return (
-    <div className="space-y-8">
-      <div className="flex justify-between items-center">
-        <div>
-          <h1 className="text-3xl font-bold font-serif text-foreground">Subscription Plans</h1>
-          <p className="text-muted-foreground mt-1">Manage the subscription packages offered to customers.</p>
+    <div className="space-y-6 md:space-y-8">
+      <div className="flex items-center justify-between gap-4">
+        <div className="min-w-0">
+          <h1 className="text-2xl md:text-3xl font-bold font-serif text-foreground">Subscription Plans</h1>
+          <p className="text-muted-foreground mt-1 text-sm">Manage the subscription packages offered to customers.</p>
         </div>
-        
+
         <Dialog open={isCreateOpen} onOpenChange={(open) => { setIsCreateOpen(open); if (!open) resetForm(); }}>
           <DialogTrigger asChild>
-            <Button><Plus className="w-4 h-4 mr-2" /> Add Plan</Button>
+            <Button className="shrink-0"><Plus className="w-4 h-4 mr-2" /> Add Plan</Button>
           </DialogTrigger>
           <DialogContent>
             <DialogHeader>
@@ -149,45 +149,49 @@ export default function AdminPlans() {
       </div>
 
       <div className="border rounded-xl bg-card">
-        <Table>
-          <TableHeader>
-            <TableRow>
-              <TableHead>Name</TableHead>
-              <TableHead>Price</TableHead>
-              <TableHead>Duration</TableHead>
-              <TableHead>Meals/Day</TableHead>
-              <TableHead className="text-right">Actions</TableHead>
-            </TableRow>
-          </TableHeader>
-          <TableBody>
-            {isLoading ? (
+        <div className="overflow-x-auto">
+          <Table>
+            <TableHeader>
               <TableRow>
-                <TableCell colSpan={5} className="text-center py-8">Loading plans...</TableCell>
+                <TableHead>Name</TableHead>
+                <TableHead className="whitespace-nowrap">Price</TableHead>
+                <TableHead className="whitespace-nowrap hidden sm:table-cell">Duration</TableHead>
+                <TableHead className="whitespace-nowrap hidden sm:table-cell">Meals/Day</TableHead>
+                <TableHead className="text-right">Actions</TableHead>
               </TableRow>
-            ) : plans?.length === 0 ? (
-              <TableRow>
-                <TableCell colSpan={5} className="text-center py-8 text-muted-foreground">No plans found.</TableCell>
-              </TableRow>
-            ) : (
-              plans?.map((plan) => (
-                <TableRow key={plan.id}>
-                  <TableCell className="font-medium">{plan.name}</TableCell>
-                  <TableCell className="font-mono">{formatCurrency(plan.price)}</TableCell>
-                  <TableCell>{plan.durationDays} days</TableCell>
-                  <TableCell>{plan.mealsPerDay}</TableCell>
-                  <TableCell className="text-right space-x-2">
-                    <Button variant="ghost" size="icon" onClick={() => handleEdit(plan)}>
-                      <Edit2 className="w-4 h-4" />
-                    </Button>
-                    <Button variant="ghost" size="icon" className="text-destructive hover:text-destructive hover:bg-destructive/10" onClick={() => handleDelete(plan.id)}>
-                      <Trash2 className="w-4 h-4" />
-                    </Button>
-                  </TableCell>
+            </TableHeader>
+            <TableBody>
+              {isLoading ? (
+                <TableRow>
+                  <TableCell colSpan={5} className="text-center py-8">Loading plans...</TableCell>
                 </TableRow>
-              ))
-            )}
-          </TableBody>
-        </Table>
+              ) : plans?.length === 0 ? (
+                <TableRow>
+                  <TableCell colSpan={5} className="text-center py-8 text-muted-foreground">No plans found.</TableCell>
+                </TableRow>
+              ) : (
+                plans?.map((plan) => (
+                  <TableRow key={plan.id}>
+                    <TableCell className="font-medium">{plan.name}</TableCell>
+                    <TableCell className="font-mono whitespace-nowrap">{formatCurrency(plan.price)}</TableCell>
+                    <TableCell className="whitespace-nowrap hidden sm:table-cell">{plan.durationDays} days</TableCell>
+                    <TableCell className="hidden sm:table-cell">{plan.mealsPerDay}</TableCell>
+                    <TableCell className="text-right">
+                      <div className="flex items-center justify-end gap-1">
+                        <Button variant="ghost" size="icon" onClick={() => handleEdit(plan)}>
+                          <Edit2 className="w-4 h-4" />
+                        </Button>
+                        <Button variant="ghost" size="icon" className="text-destructive hover:text-destructive hover:bg-destructive/10" onClick={() => handleDelete(plan.id)}>
+                          <Trash2 className="w-4 h-4" />
+                        </Button>
+                      </div>
+                    </TableCell>
+                  </TableRow>
+                ))
+              )}
+            </TableBody>
+          </Table>
+        </div>
       </div>
     </div>
   );

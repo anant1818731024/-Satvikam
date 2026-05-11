@@ -103,16 +103,16 @@ export default function AdminProducts() {
   };
 
   return (
-    <div className="space-y-8">
-      <div className="flex justify-between items-center">
-        <div>
-          <h1 className="text-3xl font-bold font-serif text-foreground">Menu Products</h1>
-          <p className="text-muted-foreground mt-1">Manage the items available on your menu.</p>
+    <div className="space-y-6 md:space-y-8">
+      <div className="flex items-center justify-between gap-4">
+        <div className="min-w-0">
+          <h1 className="text-2xl md:text-3xl font-bold font-serif text-foreground">Menu Products</h1>
+          <p className="text-muted-foreground mt-1 text-sm">Manage the items available on your menu.</p>
         </div>
 
         <Dialog open={isCreateOpen} onOpenChange={(open) => { setIsCreateOpen(open); if (!open) resetForm(); }}>
           <DialogTrigger asChild>
-            <Button><Plus className="w-4 h-4 mr-2" /> Add Product</Button>
+            <Button className="shrink-0"><Plus className="w-4 h-4 mr-2" /> Add Product</Button>
           </DialogTrigger>
           <DialogContent>
             <DialogHeader>
@@ -154,51 +154,55 @@ export default function AdminProducts() {
       </div>
 
       <div className="border rounded-xl bg-card">
-        <Table>
-          <TableHeader>
-            <TableRow>
-              <TableHead>Image</TableHead>
-              <TableHead>Name</TableHead>
-              <TableHead>Description</TableHead>
-              <TableHead>Price</TableHead>
-              <TableHead className="text-right">Actions</TableHead>
-            </TableRow>
-          </TableHeader>
-          <TableBody>
-            {isLoading ? (
+        <div className="overflow-x-auto">
+          <Table>
+            <TableHeader>
               <TableRow>
-                <TableCell colSpan={5} className="text-center py-8">Loading products...</TableCell>
+                <TableHead>Image</TableHead>
+                <TableHead>Name</TableHead>
+                <TableHead className="hidden sm:table-cell">Description</TableHead>
+                <TableHead>Price</TableHead>
+                <TableHead className="text-right">Actions</TableHead>
               </TableRow>
-            ) : products?.length === 0 ? (
-              <TableRow>
-                <TableCell colSpan={5} className="text-center py-8 text-muted-foreground">No products found.</TableCell>
-              </TableRow>
-            ) : (
-              products?.map((product) => (
-                <TableRow key={product.id}>
-                  <TableCell>
-                    {product.imageUrl ? (
-                      <img src={product.imageUrl} alt={product.name} className="w-12 h-12 rounded-lg object-cover border" />
-                    ) : (
-                      <div className="w-12 h-12 rounded-lg bg-muted flex items-center justify-center text-muted-foreground text-xs">No img</div>
-                    )}
-                  </TableCell>
-                  <TableCell className="font-medium">{product.name}</TableCell>
-                  <TableCell className="text-muted-foreground text-sm max-w-xs truncate">{product.description || "—"}</TableCell>
-                  <TableCell className="font-mono">{formatCurrency(product.price)}</TableCell>
-                  <TableCell className="text-right space-x-2">
-                    <Button variant="ghost" size="icon" onClick={() => handleEdit(product)}>
-                      <Edit2 className="w-4 h-4" />
-                    </Button>
-                    <Button variant="ghost" size="icon" className="text-destructive hover:text-destructive hover:bg-destructive/10" onClick={() => handleDelete(product.id)}>
-                      <Trash2 className="w-4 h-4" />
-                    </Button>
-                  </TableCell>
+            </TableHeader>
+            <TableBody>
+              {isLoading ? (
+                <TableRow>
+                  <TableCell colSpan={5} className="text-center py-8">Loading products...</TableCell>
                 </TableRow>
-              ))
-            )}
-          </TableBody>
-        </Table>
+              ) : products?.length === 0 ? (
+                <TableRow>
+                  <TableCell colSpan={5} className="text-center py-8 text-muted-foreground">No products found.</TableCell>
+                </TableRow>
+              ) : (
+                products?.map((product) => (
+                  <TableRow key={product.id}>
+                    <TableCell>
+                      {product.imageUrl ? (
+                        <img src={product.imageUrl} alt={product.name} className="w-10 h-10 sm:w-12 sm:h-12 rounded-lg object-cover border" />
+                      ) : (
+                        <div className="w-10 h-10 sm:w-12 sm:h-12 rounded-lg bg-muted flex items-center justify-center text-muted-foreground text-xs">No img</div>
+                      )}
+                    </TableCell>
+                    <TableCell className="font-medium whitespace-nowrap">{product.name}</TableCell>
+                    <TableCell className="text-muted-foreground text-sm max-w-xs truncate hidden sm:table-cell">{product.description || "—"}</TableCell>
+                    <TableCell className="font-mono whitespace-nowrap">{formatCurrency(product.price)}</TableCell>
+                    <TableCell className="text-right">
+                      <div className="flex items-center justify-end gap-1">
+                        <Button variant="ghost" size="icon" onClick={() => handleEdit(product)}>
+                          <Edit2 className="w-4 h-4" />
+                        </Button>
+                        <Button variant="ghost" size="icon" className="text-destructive hover:text-destructive hover:bg-destructive/10" onClick={() => handleDelete(product.id)}>
+                          <Trash2 className="w-4 h-4" />
+                        </Button>
+                      </div>
+                    </TableCell>
+                  </TableRow>
+                ))
+              )}
+            </TableBody>
+          </Table>
+        </div>
       </div>
     </div>
   );
