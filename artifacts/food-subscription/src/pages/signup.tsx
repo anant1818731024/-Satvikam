@@ -1,6 +1,6 @@
 import { useState } from "react";
 import { Link, useLocation } from "wouter";
-import { useUserSignup } from "@workspace/api-client-react";
+import { useUserSignup, getGetUserMeQueryKey } from "@workspace/api-client-react";
 import { useQueryClient } from "@tanstack/react-query";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
@@ -42,7 +42,7 @@ export default function Signup() {
           pincode: form.pincode,
         },
       });
-      queryClient.invalidateQueries();
+      queryClient.setQueryData(getGetUserMeQueryKey(), { authenticated: true });
       navigate("/account");
     } catch (err: any) {
       const msg = err?.data?.error || "Could not create account. Please try again.";

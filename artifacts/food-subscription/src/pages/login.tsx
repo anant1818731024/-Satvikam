@@ -1,6 +1,6 @@
 import { useState } from "react";
 import { Link, useLocation } from "wouter";
-import { useUserLogin } from "@workspace/api-client-react";
+import { useUserLogin, getGetUserMeQueryKey } from "@workspace/api-client-react";
 import { useQueryClient } from "@tanstack/react-query";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
@@ -21,8 +21,8 @@ export default function Login() {
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     try {
-      await login.mutateAsync({ data: { phone, password } });
-      queryClient.invalidateQueries();
+      const result = await login.mutateAsync({ data: { phone, password } });
+      queryClient.setQueryData(getGetUserMeQueryKey(), result);
       navigate(redirect);
     } catch {
       toast({ title: "Login failed", description: "Wrong phone number or password.", variant: "destructive" });

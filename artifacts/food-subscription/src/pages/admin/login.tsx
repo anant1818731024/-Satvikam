@@ -1,6 +1,6 @@
 import { useState } from "react";
 import { useLocation } from "wouter";
-import { useAdminLogin } from "@workspace/api-client-react";
+import { useAdminLogin, getGetAdminMeQueryKey } from "@workspace/api-client-react";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { useToast } from "@/hooks/use-toast";
@@ -19,7 +19,10 @@ export default function AdminLogin() {
     try {
       const result = await login.mutateAsync({ data: { password } });
       if (result.authenticated) {
-        queryClient.invalidateQueries();
+        // Set cache synchronously before navigating so AdminLayout
+        // sees authenticated=true immediately — avoids the race where
+        // stale unauthenticated data bounces the user back to /login.
+        queryClient.setQueryData(getGetAdminMeQueryKey(), { authenticated: true });
         navigate("/admin");
       }
     } catch {
