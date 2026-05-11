@@ -4,7 +4,7 @@ import { useAdminLogin } from "@workspace/api-client-react";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { useToast } from "@/hooks/use-toast";
-import { Loader2, Lock, Shield, KeyRound } from "lucide-react";
+import { Loader2, Lock, Shield } from "lucide-react";
 import { useQueryClient } from "@tanstack/react-query";
 
 export default function AdminLogin() {
@@ -61,33 +61,13 @@ export default function AdminLogin() {
           </Button>
         </form>
 
-        {/* Security info */}
-        <div className="mt-4 space-y-2">
-          <div className="flex items-start gap-2.5 bg-muted/60 border rounded-xl px-4 py-3 text-sm text-muted-foreground">
-            <Shield className="w-4 h-4 mt-0.5 flex-shrink-0 text-primary/70" />
-            <span>
-              To change your password, log in and go to{" "}
-              <span className="font-medium text-foreground">Admin → Security</span>.
-            </span>
-          </div>
-          <details className="group">
-            <summary className="flex items-center gap-2 px-4 py-2.5 text-xs text-muted-foreground cursor-pointer select-none hover:text-foreground transition-colors list-none">
-              <KeyRound className="w-3.5 h-3.5 flex-shrink-0" />
-              Locked out?
-              <span className="ml-auto group-open:rotate-180 transition-transform">▾</span>
-            </summary>
-            <div className="bg-amber-50 border border-amber-200 rounded-xl px-4 py-3 text-xs text-amber-800 space-y-1.5 mt-1">
-              <p className="font-semibold">Emergency password reset</p>
-              <ol className="list-decimal list-inside space-y-1 leading-relaxed">
-                <li>Set the <code className="bg-amber-100 px-1 rounded font-mono">ADMIN_PASSWORD</code> environment secret to your desired new password</li>
-                <li>Connect to the database and run:<br />
-                  <code className="bg-amber-100 px-1 rounded font-mono block mt-1">DELETE FROM admin_config;</code>
-                </li>
-                <li>Restart the API server — it will re-seed from the env var</li>
-                <li>Log in with the new password, then remove the env var</li>
-              </ol>
-            </div>
-          </details>
+        {/* Security hint */}
+        <div className="mt-4 flex items-start gap-2.5 bg-muted/60 border rounded-xl px-4 py-3 text-sm text-muted-foreground">
+          <Shield className="w-4 h-4 mt-0.5 flex-shrink-0 text-primary/70" />
+          <span>
+            To change your password, log in and go to{" "}
+            <span className="font-medium text-foreground">Admin → Security</span>.
+          </span>
         </div>
       </div>
     </div>
