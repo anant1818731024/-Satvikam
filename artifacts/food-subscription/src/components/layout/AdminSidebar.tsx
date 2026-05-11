@@ -1,5 +1,5 @@
 import { Link, useLocation } from "wouter";
-import { LayoutDashboard, Package, Coffee, ShoppingBag, CalendarClock, Home, Truck, LogOut } from "lucide-react";
+import { LayoutDashboard, Package, Coffee, ShoppingBag, CalendarClock, Home, Truck, LogOut, Shield } from "lucide-react";
 import { useAdminLogout } from "@workspace/api-client-react";
 import { useQueryClient } from "@tanstack/react-query";
 
@@ -10,6 +10,7 @@ const links = [
   { href: "/admin/orders", label: "Orders", icon: ShoppingBag },
   { href: "/admin/subscriptions", label: "Subscriptions", icon: CalendarClock },
   { href: "/admin/delivery", label: "Delivery", icon: Truck },
+  { href: "/admin/security", label: "Security", icon: Shield },
 ];
 
 export function AdminSidebar() {

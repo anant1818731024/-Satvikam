@@ -510,3 +510,15 @@ export const AdminLogoutResponse = zod.object({
 export const GetAdminMeResponse = zod.object({
   authenticated: zod.boolean(),
 });
+
+/**
+ * @summary Change the admin password
+ */
+export const AdminChangePasswordBody = zod.object({
+  currentPassword: zod.string(),
+  newPassword: zod.string(),
+});
+
+export const AdminChangePasswordResponse = zod.object({
+  authenticated: zod.boolean(),
+});

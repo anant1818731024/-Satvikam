@@ -1,11 +1,19 @@
 import { Router, type IRouter, type Request, type Response, type NextFunction } from "express";
+import bcrypt from "bcryptjs";
 import { eq, count, sum } from "drizzle-orm";
-import { db, ordersTable, subscriptionsTable, usersTable } from "@workspace/db";
-import { GetAdminSummaryResponse, AdminLoginBody } from "@workspace/api-zod";
+import { db, ordersTable, subscriptionsTable, usersTable, adminConfigTable } from "@workspace/db";
+import { GetAdminSummaryResponse, AdminLoginBody, AdminChangePasswordBody } from "@workspace/api-zod";
 
 const router: IRouter = Router();
 
-const ADMIN_PASSWORD = process.env.ADMIN_PASSWORD || "admin123";
+async function getOrCreateAdminConfig() {
+  const [existing] = await db.select().from(adminConfigTable);
+  if (existing) return existing;
+  const fallback = process.env.ADMIN_PASSWORD || "admin123";
+  const passwordHash = await bcrypt.hash(fallback, 12);
+  const [created] = await db.insert(adminConfigTable).values({ passwordHash }).returning();
+  return created;
+}
 
 export function requireAdmin(req: Request, res: Response, next: NextFunction): void {
   if (req.session?.isAdmin) {
@@ -21,7 +29,9 @@ router.post("/admin/login", async (req, res): Promise<void> => {
     res.status(400).json({ error: "Password required" });
     return;
   }
-  if (parsed.data.password !== ADMIN_PASSWORD) {
+  const config = await getOrCreateAdminConfig();
+  const valid = await bcrypt.compare(parsed.data.password, config.passwordHash);
+  if (!valid) {
     res.status(401).json({ error: "Invalid password" });
     return;
   }
@@ -36,6 +46,27 @@ router.post("/admin/logout", (req, res): void => {
 
 router.get("/admin/me", (req, res): void => {
   res.json({ authenticated: !!req.session?.isAdmin });
+});
+
+router.post("/admin/change-password", requireAdmin, async (req, res): Promise<void> => {
+  const parsed = AdminChangePasswordBody.safeParse(req.body);
+  if (!parsed.success) {
+    res.status(400).json({ error: "currentPassword and newPassword are required" });
+    return;
+  }
+  if (parsed.data.newPassword.length < 8) {
+    res.status(400).json({ error: "New password must be at least 8 characters" });
+    return;
+  }
+  const config = await getOrCreateAdminConfig();
+  const valid = await bcrypt.compare(parsed.data.currentPassword, config.passwordHash);
+  if (!valid) {
+    res.status(401).json({ error: "Current password is incorrect" });
+    return;
+  }
+  const newHash = await bcrypt.hash(parsed.data.newPassword, 12);
+  await db.update(adminConfigTable).set({ passwordHash: newHash, updatedAt: new Date() }).where(eq(adminConfigTable.id, config.id));
+  res.json({ authenticated: true });
 });
 
 router.get("/admin/summary", requireAdmin, async (req, res): Promise<void> => {

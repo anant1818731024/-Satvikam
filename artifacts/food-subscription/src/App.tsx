@@ -23,6 +23,7 @@ import AdminPlans from "@/pages/admin/plans";
 import AdminOrders from "@/pages/admin/orders";
 import AdminSubscriptions from "@/pages/admin/subscriptions";
 import AdminDelivery from "@/pages/admin/delivery";
+import AdminSecurity from "@/pages/admin/security";
 
 const queryClient = new QueryClient({
   defaultOptions: {
@@ -49,6 +50,7 @@ function AppRouter() {
       <Route path="/admin/orders">{() => <AdminRoute component={AdminOrders} />}</Route>
       <Route path="/admin/subscriptions">{() => <AdminRoute component={AdminSubscriptions} />}</Route>
       <Route path="/admin/delivery">{() => <AdminRoute component={AdminDelivery} />}</Route>
+      <Route path="/admin/security">{() => <AdminRoute component={AdminSecurity} />}</Route>
       <Route path="/admin">{() => <AdminRoute component={AdminDashboard} />}</Route>
 
       <Route path="/" nest>

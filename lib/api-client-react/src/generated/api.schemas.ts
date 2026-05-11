@@ -265,6 +265,11 @@ export interface AdminAuthResponse {
   authenticated: boolean;
 }
 
+export interface AdminChangePasswordBody {
+  currentPassword: string;
+  newPassword: string;
+}
+
 export type ListOrdersParams = {
   status?: ListOrdersStatus;
   type?: ListOrdersType;

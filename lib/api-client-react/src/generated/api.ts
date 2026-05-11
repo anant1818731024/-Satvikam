@@ -18,6 +18,7 @@ import type {
 
 import type {
   AdminAuthResponse,
+  AdminChangePasswordBody,
   AdminLoginBody,
   AdminSummary,
   ConfirmTestPaymentBody,
@@ -2684,3 +2685,89 @@ export function useGetAdminMe<
 
   return { ...query, queryKey: queryOptions.queryKey };
 }
+
+/**
+ * @summary Change the admin password
+ */
+export const getAdminChangePasswordUrl = () => {
+  return `/api/admin/change-password`;
+};
+
+export const adminChangePassword = async (
+  adminChangePasswordBody: AdminChangePasswordBody,
+  options?: RequestInit,
+): Promise<AdminAuthResponse> => {
+  return customFetch<AdminAuthResponse>(getAdminChangePasswordUrl(), {
+    ...options,
+    method: "POST",
+    headers: { "Content-Type": "application/json", ...options?.headers },
+    body: JSON.stringify(adminChangePasswordBody),
+  });
+};
+
+export const getAdminChangePasswordMutationOptions = <
+  TError = ErrorType<ErrorResponse>,
+  TContext = unknown,
+>(options?: {
+  mutation?: UseMutationOptions<
+    Awaited<ReturnType<typeof adminChangePassword>>,
+    TError,
+    { data: BodyType<AdminChangePasswordBody> },
+    TContext
+  >;
+  request?: SecondParameter<typeof customFetch>;
+}): UseMutationOptions<
+  Awaited<ReturnType<typeof adminChangePassword>>,
+  TError,
+  { data: BodyType<AdminChangePasswordBody> },
+  TContext
+> => {
+  const mutationKey = ["adminChangePassword"];
+  const { mutation: mutationOptions, request: requestOptions } = options
+    ? options.mutation &&
+      "mutationKey" in options.mutation &&
+      options.mutation.mutationKey
+      ? options
+      : { ...options, mutation: { ...options.mutation, mutationKey } }
+    : { mutation: { mutationKey }, request: undefined };
+
+  const mutationFn: MutationFunction<
+    Awaited<ReturnType<typeof adminChangePassword>>,
+    { data: BodyType<AdminChangePasswordBody> }
+  > = (props) => {
+    const { data } = props ?? {};
+
+    return adminChangePassword(data, requestOptions);
+  };
+
+  return { mutationFn, ...mutationOptions };
+};
+
+export type AdminChangePasswordMutationResult = NonNullable<
+  Awaited<ReturnType<typeof adminChangePassword>>
+>;
+export type AdminChangePasswordMutationBody = BodyType<AdminChangePasswordBody>;
+export type AdminChangePasswordMutationError = ErrorType<ErrorResponse>;
+
+/**
+ * @summary Change the admin password
+ */
+export const useAdminChangePassword = <
+  TError = ErrorType<ErrorResponse>,
+  TContext = unknown,
+>(options?: {
+  mutation?: UseMutationOptions<
+    Awaited<ReturnType<typeof adminChangePassword>>,
+    TError,
+    { data: BodyType<AdminChangePasswordBody> },
+    TContext
+  >;
+  request?: SecondParameter<typeof customFetch>;
+}): UseMutationResult<
+  Awaited<ReturnType<typeof adminChangePassword>>,
+  TError,
+  { data: BodyType<AdminChangePasswordBody> },
+  TContext
+> => {
+  return useMutation(getAdminChangePasswordMutationOptions(options));
+};
