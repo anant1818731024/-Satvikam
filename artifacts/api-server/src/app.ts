@@ -1,9 +1,11 @@
 import express, { type Express } from "express";
 import cors from "cors";
 import session from "express-session";
+import connectPgSimple from "connect-pg-simple";
 import pinoHttp from "pino-http";
 import router from "./routes";
 import { logger } from "./lib/logger";
+import { pool } from "@workspace/db";
 
 declare module "express-session" {
   interface SessionData {
@@ -36,8 +38,14 @@ app.use(
 app.use(cors({ origin: true, credentials: true }));
 app.use(express.json());
 app.use(express.urlencoded({ extended: true }));
+const PgSession = connectPgSimple(session);
+
 app.use(
   session({
+    store: new PgSession({
+      pool,
+      tableName: "sessions",
+    }),
     secret: process.env.SESSION_SECRET || "saffron-session-secret",
     resave: false,
     saveUninitialized: false,
