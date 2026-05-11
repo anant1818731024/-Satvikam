@@ -14,7 +14,14 @@ declare module "express-session" {
   }
 }
 
+if (!process.env.SESSION_SECRET) {
+  throw new Error("SESSION_SECRET must be set. Add it as an environment secret.");
+}
+
 const app: Express = express();
+
+// Trust Replit's reverse proxy so req.secure and req.ip are correct
+app.set("trust proxy", 1);
 
 app.use(
   pinoHttp({
@@ -38,7 +45,9 @@ app.use(
 app.use(cors({ origin: true, credentials: true }));
 app.use(express.json());
 app.use(express.urlencoded({ extended: true }));
+
 const PgSession = connectPgSimple(session);
+const isProd = process.env.NODE_ENV === "production";
 
 app.use(
   session({
@@ -46,12 +55,13 @@ app.use(
       pool,
       tableName: "sessions",
     }),
-    secret: process.env.SESSION_SECRET || "saffron-session-secret",
+    secret: process.env.SESSION_SECRET,
     resave: false,
     saveUninitialized: false,
     cookie: {
       httpOnly: true,
-      secure: false,
+      secure: isProd,
+      sameSite: isProd ? "strict" : "lax",
       maxAge: 7 * 24 * 60 * 60 * 1000,
     },
   }),
