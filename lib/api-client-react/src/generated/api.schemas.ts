@@ -270,6 +270,33 @@ export interface AdminChangePasswordBody {
   newPassword: string;
 }
 
+export interface ForgotPasswordBody {
+  phone: string;
+}
+
+export interface ForgotPasswordResponse {
+  message: string;
+  resetUrl?: string;
+}
+
+export interface ResetPasswordBody {
+  token: string;
+  newPassword: string;
+}
+
+export interface ResetPasswordResponse {
+  success: boolean;
+}
+
+export interface AdminForgotPasswordBody {
+  recoverySecret: string;
+}
+
+export interface AdminForgotPasswordResponse {
+  message: string;
+  resetUrl: string;
+}
+
 export type ListOrdersParams = {
   status?: ListOrdersStatus;
   type?: ListOrdersType;

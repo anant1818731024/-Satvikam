@@ -512,6 +512,54 @@ export const GetAdminMeResponse = zod.object({
 });
 
 /**
+ * @summary Request a password reset link
+ */
+export const ForgotPasswordBody = zod.object({
+  phone: zod.string(),
+});
+
+export const ForgotPasswordResponse = zod.object({
+  message: zod.string(),
+  resetUrl: zod.string().optional(),
+});
+
+/**
+ * @summary Reset user password using a token
+ */
+export const ResetPasswordBody = zod.object({
+  token: zod.string(),
+  newPassword: zod.string(),
+});
+
+export const ResetPasswordResponse = zod.object({
+  success: zod.boolean(),
+});
+
+/**
+ * @summary Request an admin password reset (requires ADMIN_RECOVERY_SECRET)
+ */
+export const AdminForgotPasswordBody = zod.object({
+  recoverySecret: zod.string(),
+});
+
+export const AdminForgotPasswordResponse = zod.object({
+  message: zod.string(),
+  resetUrl: zod.string(),
+});
+
+/**
+ * @summary Reset admin password using a token
+ */
+export const AdminResetPasswordBody = zod.object({
+  token: zod.string(),
+  newPassword: zod.string(),
+});
+
+export const AdminResetPasswordResponse = zod.object({
+  authenticated: zod.boolean(),
+});
+
+/**
  * @summary Change the admin password
  */
 export const AdminChangePasswordBody = zod.object({

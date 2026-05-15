@@ -64,8 +64,14 @@ export default function AdminLogin() {
           </Button>
         </form>
 
+        <div className="mt-3 text-center">
+          <a href="/admin/forgot-password" className="text-sm text-muted-foreground hover:text-primary hover:underline">
+            Forgot password?
+          </a>
+        </div>
+
         {/* Security hint */}
-        <div className="mt-4 flex items-start gap-2.5 bg-muted/60 border rounded-xl px-4 py-3 text-sm text-muted-foreground">
+        <div className="mt-3 flex items-start gap-2.5 bg-muted/60 border rounded-xl px-4 py-3 text-sm text-muted-foreground">
           <Shield className="w-4 h-4 mt-0.5 flex-shrink-0 text-primary/70" />
           <span>
             To change your password, log in and go to{" "}

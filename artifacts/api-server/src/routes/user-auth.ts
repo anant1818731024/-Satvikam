@@ -1,8 +1,9 @@
 import { Router, type IRouter, type Request, type Response, type NextFunction } from "express";
 import bcrypt from "bcryptjs";
-import { eq } from "drizzle-orm";
-import { db, usersTable, ordersTable, subscriptionsTable, plansTable, productsTable } from "@workspace/db";
-import { UserSignupBody, UserLoginBody, UpdateUserMeBody } from "@workspace/api-zod";
+import { eq, and, isNull, gt } from "drizzle-orm";
+import { randomBytes } from "node:crypto";
+import { db, usersTable, ordersTable, subscriptionsTable, plansTable, productsTable, passwordResetsTable } from "@workspace/db";
+import { UserSignupBody, UserLoginBody, UpdateUserMeBody, ForgotPasswordBody, ResetPasswordBody } from "@workspace/api-zod";
 
 const router: IRouter = Router();
 
@@ -121,6 +122,75 @@ router.patch("/users/me", requireUser, async (req, res): Promise<void> => {
     .returning();
 
   res.json(userToProfile(updated));
+});
+
+router.post("/users/forgot-password", async (req, res): Promise<void> => {
+  const parsed = ForgotPasswordBody.safeParse(req.body);
+  if (!parsed.success) {
+    res.status(400).json({ error: "Phone number is required" });
+    return;
+  }
+
+  const [user] = await db.select().from(usersTable).where(eq(usersTable.phone, parsed.data.phone));
+
+  if (!user) {
+    res.json({ message: "If an account with this phone number exists, a reset link has been generated." });
+    return;
+  }
+
+  await db.delete(passwordResetsTable).where(
+    and(eq(passwordResetsTable.userId, user.id), isNull(passwordResetsTable.usedAt))
+  );
+
+  const token = randomBytes(32).toString("hex");
+  const expiresAt = new Date(Date.now() + 60 * 60 * 1000);
+
+  await db.insert(passwordResetsTable).values({ token, userId: user.id, isAdmin: false, expiresAt });
+
+  const resetUrl = `/reset-password?token=${token}`;
+  req.log.info({ userId: user.id }, "Password reset token generated");
+
+  res.json({ message: "Reset link generated. Use the link below to set a new password.", resetUrl });
+});
+
+router.post("/users/reset-password", async (req, res): Promise<void> => {
+  const parsed = ResetPasswordBody.safeParse(req.body);
+  if (!parsed.success) {
+    res.status(400).json({ error: "Token and new password are required" });
+    return;
+  }
+
+  const { token, newPassword } = parsed.data;
+
+  if (newPassword.length < 6) {
+    res.status(400).json({ error: "Password must be at least 6 characters" });
+    return;
+  }
+
+  const now = new Date();
+  const [reset] = await db
+    .select()
+    .from(passwordResetsTable)
+    .where(
+      and(
+        eq(passwordResetsTable.token, token),
+        eq(passwordResetsTable.isAdmin, false),
+        isNull(passwordResetsTable.usedAt),
+        gt(passwordResetsTable.expiresAt, now)
+      )
+    );
+
+  if (!reset || !reset.userId) {
+    res.status(400).json({ error: "This reset link is invalid or has expired" });
+    return;
+  }
+
+  const passwordHash = await bcrypt.hash(newPassword, 12);
+  await db.update(usersTable).set({ passwordHash }).where(eq(usersTable.id, reset.userId));
+  await db.update(passwordResetsTable).set({ usedAt: now }).where(eq(passwordResetsTable.id, reset.id));
+
+  req.log.info({ userId: reset.userId }, "User password reset successfully");
+  res.json({ success: true });
 });
 
 router.get("/users/me/orders", requireUser, async (req, res): Promise<void> => {

@@ -15,8 +15,12 @@ import Login from "@/pages/login";
 import Signup from "@/pages/signup";
 import Account from "@/pages/account";
 import Support from "@/pages/support";
+import ForgotPassword from "@/pages/forgot-password";
+import ResetPassword from "@/pages/reset-password";
 
 import AdminLogin from "@/pages/admin/login";
+import AdminForgotPassword from "@/pages/admin/forgot-password";
+import AdminResetPassword from "@/pages/admin/reset-password";
 import AdminDashboard from "@/pages/admin/dashboard";
 import AdminProducts from "@/pages/admin/products";
 import AdminPlans from "@/pages/admin/plans";
@@ -45,6 +49,8 @@ function AppRouter() {
   return (
     <Switch>
       <Route path="/admin/login" component={AdminLogin} />
+      <Route path="/admin/forgot-password" component={AdminForgotPassword} />
+      <Route path="/admin/reset-password" component={AdminResetPassword} />
       <Route path="/admin/products">{() => <AdminRoute component={AdminProducts} />}</Route>
       <Route path="/admin/plans">{() => <AdminRoute component={AdminPlans} />}</Route>
       <Route path="/admin/orders">{() => <AdminRoute component={AdminOrders} />}</Route>
@@ -65,6 +71,8 @@ function AppRouter() {
             <Route path="/signup" component={Signup} />
             <Route path="/account" component={Account} />
             <Route path="/support" component={Support} />
+            <Route path="/forgot-password" component={ForgotPassword} />
+            <Route path="/reset-password" component={ResetPassword} />
             <Route component={NotFound} />
           </Switch>
         </Layout>
