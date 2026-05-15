@@ -1,6 +1,6 @@
 import { Link } from "wouter";
 import { Button } from "@/components/ui/button";
-import { ArrowRight, Utensils, Clock, Heart } from "lucide-react";
+import { ArrowRight, Utensils, Clock, Heart, Leaf, Star, Truck } from "lucide-react";
 
 export default function Home() {
   return (
@@ -24,10 +24,54 @@ export default function Home() {
               </Button>
             </div>
           </div>
-          <div className="relative">
-            <div className="aspect-square bg-primary/10 rounded-full absolute inset-0 -translate-x-4 translate-y-4 -z-10 blur-3xl opacity-50"></div>
-            <div className="aspect-[4/3] rounded-2xl bg-secondary/50 border border-primary/10 overflow-hidden shadow-2xl flex items-center justify-center">
-              <span className="text-muted-foreground font-serif italic text-lg">Delicious food illustration</span>
+          <div className="relative px-5 pt-5 pb-5 md:px-0 md:pt-0 md:pb-0">
+            {/* Glow blob */}
+            <div className="aspect-square bg-primary/20 rounded-full absolute inset-0 -translate-x-4 translate-y-4 -z-10 blur-3xl opacity-60"></div>
+
+            {/* Main photo */}
+            <div className="aspect-[4/3] rounded-2xl overflow-hidden shadow-2xl relative">
+              <img
+                src="https://images.unsplash.com/photo-1585937421612-70a008356fbe?w=900&q=85&fit=crop"
+                alt="Fresh Indian vegetarian thali"
+                className="w-full h-full object-cover"
+              />
+              {/* Subtle gradient overlay at bottom */}
+              <div className="absolute inset-0 bg-gradient-to-t from-black/30 via-transparent to-transparent" />
+            </div>
+
+            {/* Floating badge — top left */}
+            <div className="absolute -top-4 -left-4 bg-white rounded-2xl shadow-lg px-4 py-2.5 flex items-center gap-2.5 border border-primary/10">
+              <div className="w-8 h-8 bg-green-100 rounded-full flex items-center justify-center">
+                <Leaf className="w-4 h-4 text-green-600" />
+              </div>
+              <div className="leading-tight">
+                <p className="text-xs text-muted-foreground">Always</p>
+                <p className="text-sm font-bold text-foreground">100% Veg</p>
+              </div>
+            </div>
+
+            {/* Floating badge — bottom left */}
+            <div className="absolute -bottom-4 -left-3 bg-white rounded-2xl shadow-lg px-4 py-2.5 flex items-center gap-2.5 border border-primary/10">
+              <div className="w-8 h-8 bg-primary/10 rounded-full flex items-center justify-center">
+                <Truck className="w-4 h-4 text-primary" />
+              </div>
+              <div className="leading-tight">
+                <p className="text-xs text-muted-foreground">Delivery</p>
+                <p className="text-sm font-bold text-foreground">Free Always</p>
+              </div>
+            </div>
+
+            {/* Floating rating — top right */}
+            <div className="absolute -top-3 -right-3 bg-white rounded-2xl shadow-lg px-3 py-2 flex items-center gap-1.5 border border-primary/10">
+              <Star className="w-4 h-4 text-amber-400 fill-amber-400" />
+              <span className="text-sm font-bold">4.9</span>
+              <span className="text-xs text-muted-foreground">/ 5.0</span>
+            </div>
+
+            {/* Floating meals count — bottom right */}
+            <div className="absolute -bottom-3 -right-3 bg-primary text-primary-foreground rounded-2xl shadow-lg px-4 py-2.5 leading-tight">
+              <p className="text-2xl font-bold font-serif">500+</p>
+              <p className="text-xs opacity-80">Happy customers</p>
             </div>
           </div>
         </div>
