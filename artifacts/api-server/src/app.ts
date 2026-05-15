@@ -20,7 +20,7 @@ if (!process.env.SESSION_SECRET) {
 
 const app: Express = express();
 
-// Trust Replit's reverse proxy so req.secure and req.ip are correct
+// Trust the reverse proxy so req.secure and req.ip are correct
 app.set("trust proxy", 1);
 
 app.use(

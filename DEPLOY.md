@@ -8,7 +8,7 @@
 - `pnpm --filter @workspace/db run push` — push DB schema changes (dev only)
 - `pnpm --filter @workspace/api-server run dev` — run API server locally
 
-Required secrets: `SESSION_SECRET` (for admin session), `DATABASE_URL` (auto-provided by Replit PostgreSQL)
+Required secrets: `SESSION_SECRET` (for admin session), `DATABASE_URL` (auto-provided by the configured PostgreSQL)
 Admin password: `ADMIN_PASSWORD` env var (defaults to `"admin123"`)
 
 ## Stack
