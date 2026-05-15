@@ -14,6 +14,7 @@
   "private": true,
   "devDependencies": {
     "@esbuild/darwin-arm64": "0.27.3",
+    "@rollup/rollup-darwin-arm64": "4.60.4",
     "@tailwindcss/oxide-darwin-arm64": "4.2.1",
     "lightningcss-darwin-arm64": "1.31.1",
     "prettier": "^3.8.1",

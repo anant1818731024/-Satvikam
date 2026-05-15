@@ -151,6 +151,9 @@ importers:
       '@esbuild/darwin-arm64':
         specifier: 0.27.3
         version: 0.27.3
+      '@rollup/rollup-darwin-arm64':
+        specifier: 4.60.4
+        version: 4.60.4
       '@tailwindcss/oxide-darwin-arm64':
         specifier: 4.2.1
         version: 4.2.1
@@ -1514,6 +1517,11 @@ packages:
 
   '@rolldown/pluginutils@1.0.0-rc.3':
     resolution: {integrity: sha512-eybk3TjzzzV97Dlj5c+XrBFW57eTNhzod66y9HrBlzJ6NsCrWCp/2kaPS3K9wJmurBC0Tdw4yPjXKZqlznim3Q==}
+
+  '@rollup/rollup-darwin-arm64@4.60.4':
+    resolution: {integrity: sha512-tua0TaJxMOB1R0V0RS1jFZ/RpURFDJIOR2A6jWwQeawuFyS4gBW+rntLRaQd0EQ4bd6Vp44Z2rXW+YYDBsj6IA==}
+    cpu: [arm64]
+    os: [darwin]
 
   '@rollup/rollup-linux-x64-gnu@4.60.4':
     resolution: {integrity: sha512-Boiz5+MsaROEWDf+GGEwF8VMHGhlUoQMtIPjOgA5fv4osupqTVnJteQNKJwUcnUog2G55jYXH7KZFFiJe0TEzQ==}
@@ -4236,6 +4244,8 @@ snapshots:
   '@radix-ui/rect@1.1.1': {}
 
   '@rolldown/pluginutils@1.0.0-rc.3': {}
+
+  '@rollup/rollup-darwin-arm64@4.60.4': {}
 
   '@rollup/rollup-linux-x64-gnu@4.60.4':
     optional: true

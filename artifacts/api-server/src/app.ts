@@ -5,6 +5,7 @@ import connectPgSimple from "connect-pg-simple";
 import pinoHttp from "pino-http";
 import router from "./routes";
 import { logger } from "./lib/logger";
+import { corsOrigin, sessionCookie } from "./config";
 import { pool } from "@workspace/db";
 
 declare module "express-session" {
@@ -42,12 +43,11 @@ app.use(
     },
   }),
 );
-app.use(cors({ origin: true, credentials: true }));
+app.use(cors({ origin: corsOrigin, credentials: true }));
 app.use(express.json());
 app.use(express.urlencoded({ extended: true }));
 
 const PgSession = connectPgSimple(session);
-const isProd = process.env.NODE_ENV === "production";
 
 app.use(
   session({
@@ -60,8 +60,8 @@ app.use(
     saveUninitialized: false,
     cookie: {
       httpOnly: true,
-      secure: isProd,
-      sameSite: isProd ? "strict" : "lax",
+      secure: sessionCookie.secure,
+      sameSite: sessionCookie.sameSite,
       maxAge: 7 * 24 * 60 * 60 * 1000,
     },
   }),
