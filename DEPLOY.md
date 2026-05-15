@@ -11,6 +11,20 @@
 Required secrets: `SESSION_SECRET` (for admin session), `DATABASE_URL` (auto-provided by the configured PostgreSQL)
 Admin password: `ADMIN_PASSWORD` env var (defaults to `"admin123"`)
 
+Render deployment note: if you deploy the workspace on Render, allow pnpm build scripts and approve packages before building:
+
+```bash
+pnpm install --ignore-scripts=false
+pnpm approve-builds --all
+pnpm --filter @workspace/api-server build
+```
+
+For the frontend build, set `BASE_PATH=/` and `PORT=4173` before running:
+
+```bash
+BASE_PATH=/ PORT=4173 pnpm --filter @workspace/food-subscription run build
+```
+
 ## Stack
 
 - **Monorepo tool**: pnpm workspaces
