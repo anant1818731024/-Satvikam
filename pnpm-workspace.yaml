@@ -65,10 +65,6 @@ onlyBuiltDependencies:
   - msw
   - unrs-resolver
 
-allowBuilds:
-  bcrypt: true
-  esbuild: true
-
 overrides:
   # workspace uses linux-x64 only, we can exclude all other platforms
   "esbuild>@esbuild/darwin-arm64": "-"
