@@ -7,6 +7,7 @@ import { Input } from "@/components/ui/input";
 import { Textarea } from "@/components/ui/textarea";
 import { useToast } from "@/hooks/use-toast";
 import { Loader2 } from "lucide-react";
+import { SaffronLogo } from "@/components/brand/SaffronLogo";
 
 export default function Signup() {
   const [, navigate] = useLocation();
@@ -54,6 +55,7 @@ export default function Signup() {
     <div className="flex-1 flex items-center justify-center py-16 px-4">
       <div className="w-full max-w-md">
         <div className="text-center mb-8">
+          <SaffronLogo size="xl" className="justify-center mb-4" />
           <h1 className="text-3xl font-bold font-serif mb-2">Create your account</h1>
           <p className="text-muted-foreground">Join Saffron and start getting wholesome meals</p>
         </div>

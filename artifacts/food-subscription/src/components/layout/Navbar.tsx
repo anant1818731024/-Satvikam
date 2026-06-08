@@ -13,6 +13,7 @@ import {
   DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu";
 import { Sheet, SheetContent } from "@/components/ui/sheet";
+import { SaffronLogo } from "@/components/brand/SaffronLogo";
 
 export function Navbar() {
   const [location, navigate] = useLocation();
@@ -48,11 +49,8 @@ export function Navbar() {
             <Menu className="w-5 h-5" />
           </Button>
 
-          <Link href="/" className="flex items-center gap-2">
-            <div className="w-8 h-8 bg-primary text-primary-foreground rounded-full flex items-center justify-center font-bold font-serif text-lg">
-              S
-            </div>
-            <span className="font-serif font-bold text-xl text-foreground">Saffron.</span>
+          <Link href="/">
+            <SaffronLogo showWordmark />
           </Link>
         </div>
 
@@ -121,11 +119,8 @@ export function Navbar() {
       {/* Mobile nav Sheet */}
       <Sheet open={mobileOpen} onOpenChange={setMobileOpen}>
         <SheetContent side="left" className="w-72 pt-0">
-          <div className="flex items-center gap-2 h-16 border-b mb-4">
-            <div className="w-8 h-8 bg-primary text-primary-foreground rounded-full flex items-center justify-center font-bold font-serif text-lg">
-              S
-            </div>
-            <span className="font-serif font-bold text-xl text-foreground">Saffron.</span>
+          <div className="flex items-center h-16 border-b mb-4">
+            <SaffronLogo showWordmark />
           </div>
           <nav className="flex flex-col gap-1">
             {navLinks.map((link) => (

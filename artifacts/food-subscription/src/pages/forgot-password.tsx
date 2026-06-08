@@ -5,6 +5,7 @@ import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { useToast } from "@/hooks/use-toast";
 import { Loader2, Phone, CheckCircle2, Copy, ArrowRight } from "lucide-react";
+import { SaffronLogo } from "@/components/brand/SaffronLogo";
 
 export default function ForgotPassword() {
   const [phone, setPhone] = useState("");
@@ -80,6 +81,7 @@ export default function ForgotPassword() {
     <div className="flex-1 flex items-center justify-center py-16 px-4">
       <div className="w-full max-w-sm">
         <div className="text-center mb-8">
+          <SaffronLogo size="xl" className="justify-center mb-4" />
           <h1 className="text-3xl font-bold font-serif mb-2">Forgot password?</h1>
           <p className="text-muted-foreground">Enter your phone number to get a reset link.</p>
         </div>

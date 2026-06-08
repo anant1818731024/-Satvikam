@@ -5,6 +5,7 @@ import { useAdminLogout } from "@workspace/api-client-react";
 import { useQueryClient } from "@tanstack/react-query";
 import { Sheet, SheetContent } from "@/components/ui/sheet";
 import { Button } from "@/components/ui/button";
+import { SaffronLogo } from "@/components/brand/SaffronLogo";
 
 const links = [
   { href: "/admin", label: "Dashboard", icon: LayoutDashboard },
@@ -24,12 +25,7 @@ function NavItems({ location, onNavigate, handleLogout }: {
   return (
     <div className="flex flex-col h-full">
       <div className="p-6 border-b border-sidebar-border">
-        <div className="flex items-center gap-2 mb-2">
-          <div className="w-8 h-8 bg-primary text-primary-foreground rounded-full flex items-center justify-center font-bold font-serif text-lg">
-            S
-          </div>
-          <span className="font-serif font-bold text-xl text-sidebar-foreground">Saffron.</span>
-        </div>
+        <SaffronLogo showWordmark wordmarkClassName="text-sidebar-foreground" className="mb-2" />
         <p className="text-xs text-sidebar-foreground/60 font-medium">Administration</p>
       </div>
       <nav className="flex-1 overflow-y-auto p-4 space-y-1">
@@ -92,12 +88,7 @@ export function AdminSidebar() {
         <Button variant="ghost" size="icon" onClick={() => setMobileOpen(true)}>
           <Menu className="w-5 h-5" />
         </Button>
-        <div className="flex items-center gap-2">
-          <div className="w-7 h-7 bg-primary text-primary-foreground rounded-full flex items-center justify-center font-bold font-serif">
-            S
-          </div>
-          <span className="font-serif font-bold text-lg text-sidebar-foreground">Saffron.</span>
-        </div>
+        <SaffronLogo size="sm" showWordmark wordmarkClassName="text-sidebar-foreground" />
         <span className="text-xs text-sidebar-foreground/60 font-medium">Admin</span>
       </header>
 

@@ -5,6 +5,7 @@ import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { useToast } from "@/hooks/use-toast";
 import { Loader2, KeyRound, CheckCircle2, Copy, ArrowRight, Info } from "lucide-react";
+import { SaffronLogo } from "@/components/brand/SaffronLogo";
 
 export default function AdminForgotPassword() {
   const [secret, setSecret] = useState("");
@@ -72,9 +73,7 @@ export default function AdminForgotPassword() {
     <div className="min-h-[100dvh] flex items-center justify-center bg-background px-4">
       <div className="w-full max-w-sm space-y-4">
         <div className="text-center mb-6">
-          <div className="w-14 h-14 bg-primary text-primary-foreground rounded-full flex items-center justify-center font-bold font-serif text-2xl mx-auto mb-4">
-            S
-          </div>
+          <SaffronLogo size="xl" className="justify-center mb-4" />
           <h1 className="text-2xl font-bold font-serif">Admin Recovery</h1>
           <p className="text-muted-foreground text-sm mt-1">Enter your recovery secret to reset the admin password</p>
         </div>

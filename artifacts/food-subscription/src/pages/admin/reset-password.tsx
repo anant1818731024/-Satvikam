@@ -5,6 +5,7 @@ import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { useToast } from "@/hooks/use-toast";
 import { Loader2, Lock, CheckCircle2 } from "lucide-react";
+import { SaffronLogo } from "@/components/brand/SaffronLogo";
 
 export default function AdminResetPassword() {
   const [password, setPassword] = useState("");
@@ -73,9 +74,7 @@ export default function AdminResetPassword() {
     <div className="min-h-[100dvh] flex items-center justify-center bg-background px-4">
       <div className="w-full max-w-sm">
         <div className="text-center mb-8">
-          <div className="w-14 h-14 bg-primary text-primary-foreground rounded-full flex items-center justify-center font-bold font-serif text-2xl mx-auto mb-4">
-            S
-          </div>
+          <SaffronLogo size="xl" className="justify-center mb-4" />
           <h1 className="text-2xl font-bold font-serif">Set new admin password</h1>
           <p className="text-muted-foreground text-sm mt-1">Choose a strong password (at least 8 characters).</p>
         </div>

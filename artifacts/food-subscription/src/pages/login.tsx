@@ -6,6 +6,7 @@ import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { useToast } from "@/hooks/use-toast";
 import { Loader2, Phone, Lock } from "lucide-react";
+import { SaffronLogo } from "@/components/brand/SaffronLogo";
 
 export default function Login() {
   const [phone, setPhone] = useState("");
@@ -33,6 +34,7 @@ export default function Login() {
     <div className="flex-1 flex items-center justify-center py-16 px-4">
       <div className="w-full max-w-sm">
         <div className="text-center mb-8">
+          <SaffronLogo size="xl" className="justify-center mb-4" />
           <h1 className="text-3xl font-bold font-serif mb-2">Welcome back</h1>
           <p className="text-muted-foreground">Sign in to your Saffron account</p>
         </div>
