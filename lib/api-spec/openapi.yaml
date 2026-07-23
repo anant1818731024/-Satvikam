@@ -24,6 +24,8 @@ tags:
     description: Payment operations
   - name: admin
     description: Admin operations
+  - name: settings
+    description: Public application settings
 
 paths:
   /healthz:
@@ -641,6 +643,51 @@ paths:
             application/json:
               schema:
                 $ref: "#/components/schemas/WebhookResponse"
+
+  # Settings
+  /settings:
+    get:
+      operationId: getSettings
+      tags: [settings]
+      summary: Get public application settings (e.g. WhatsApp contact number)
+      responses:
+        "200":
+          description: Application settings
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/AppSettings"
+
+  /admin/settings:
+    put:
+      operationId: updateAdminSettings
+      tags: [admin]
+      summary: Update application settings (e.g. WhatsApp contact number)
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/UpdateAppSettingsBody"
+      responses:
+        "200":
+          description: Settings updated
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/AppSettings"
+        "400":
+          description: Validation error
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ErrorResponse"
+        "401":
+          description: Unauthorized
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ErrorResponse"
 
   # Admin
   /admin/summary:
@@ -1318,6 +1365,22 @@ components:
       required:
         - currentPassword
         - newPassword
+
+    AppSettings:
+      type: object
+      properties:
+        whatsappNumber:
+          type: string
+      required:
+        - whatsappNumber
+
+    UpdateAppSettingsBody:
+      type: object
+      properties:
+        whatsappNumber:
+          type: string
+      required:
+        - whatsappNumber
 
     ForgotPasswordBody:
       type: object

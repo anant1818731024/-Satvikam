@@ -1,6 +1,6 @@
 import { useState } from "react";
 import { Link, useLocation } from "wouter";
-import { LayoutDashboard, Package, Coffee, ShoppingBag, CalendarClock, Home, Truck, LogOut, Shield, Menu } from "lucide-react";
+import { LayoutDashboard, Package, Coffee, ShoppingBag, CalendarClock, Home, Truck, LogOut, Shield, Settings, Menu } from "lucide-react";
 import { useAdminLogout } from "@workspace/api-client-react";
 import { useQueryClient } from "@tanstack/react-query";
 import { Sheet, SheetContent } from "@/components/ui/sheet";
@@ -15,6 +15,7 @@ const links = [
   { href: "/admin/subscriptions", label: "Subscriptions", icon: CalendarClock },
   { href: "/admin/delivery", label: "Delivery", icon: Truck },
   { href: "/admin/security", label: "Security", icon: Shield },
+  { href: "/admin/settings", label: "Settings", icon: Settings },
 ];
 
 function NavItems({ location, onNavigate, handleLogout }: {

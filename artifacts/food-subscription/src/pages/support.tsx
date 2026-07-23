@@ -1,7 +1,8 @@
 import { MessageCircle, Phone, Mail, Clock, HelpCircle } from "lucide-react";
 import { Button } from "@/components/ui/button";
+import { useGetSettings } from "@workspace/api-client-react";
 
-const WHATSAPP_NUMBER = "919999999999";
+const FALLBACK_WHATSAPP_NUMBER = "919999999999";
 
 const faqs = [
   {
@@ -39,7 +40,9 @@ const faqs = [
 ];
 
 export default function Support() {
-  const whatsappUrl = `https://wa.me/${WHATSAPP_NUMBER}?text=${encodeURIComponent("Hi Saffron! I need help with my account.")}`;
+  const { data: settings } = useGetSettings();
+  const whatsappNumber = settings?.whatsappNumber || FALLBACK_WHATSAPP_NUMBER;
+  const whatsappUrl = `https://wa.me/${whatsappNumber}?text=${encodeURIComponent("Hi Saffron! I need help with my account.")}`;
 
   return (
     <div className="container mx-auto px-4 py-12 max-w-3xl">

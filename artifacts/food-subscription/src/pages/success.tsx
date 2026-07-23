@@ -1,16 +1,20 @@
 import { Link } from "wouter";
 import { Button } from "@/components/ui/button";
 import { CheckCircle2, MessageCircle, Package, Truck, Clock } from "lucide-react";
-import { useGetOrderByOrderId } from "@workspace/api-client-react";
+import { useGetOrderByOrderId, useGetSettings } from "@workspace/api-client-react";
+
+const FALLBACK_WHATSAPP_NUMBER = "919999999999";
 
 export default function Success() {
   const searchParams = new URLSearchParams(window.location.search);
   const orderId = searchParams.get("orderId") || "";
 
   const { data: order } = useGetOrderByOrderId(orderId, { query: { enabled: !!orderId } as any });
+  const { data: settings } = useGetSettings();
 
+  const whatsappNumber = settings?.whatsappNumber || FALLBACK_WHATSAPP_NUMBER;
   const whatsappMessage = encodeURIComponent(`Hi, I placed order ${orderId || "recently"}. I'd like to know my delivery schedule.`);
-  const whatsappUrl = `https://wa.me/919999999999?text=${whatsappMessage}`;
+  const whatsappUrl = `https://wa.me/${whatsappNumber}?text=${whatsappMessage}`;
 
   const deliveryIcon = order?.deliveryStatus === "delivered" ? Truck : Clock;
   const DeliveryIcon = deliveryIcon;

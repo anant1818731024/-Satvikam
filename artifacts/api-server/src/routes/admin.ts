@@ -3,7 +3,16 @@ import bcrypt from "bcryptjs";
 import { eq, count, sum, and, isNull, gt } from "drizzle-orm";
 import { randomBytes } from "node:crypto";
 import { db, ordersTable, subscriptionsTable, usersTable, adminConfigTable, passwordResetsTable } from "@workspace/db";
-import { GetAdminSummaryResponse, AdminLoginBody, AdminChangePasswordBody, AdminForgotPasswordBody, ResetPasswordBody } from "@workspace/api-zod";
+import {
+  GetAdminSummaryResponse,
+  AdminLoginBody,
+  AdminChangePasswordBody,
+  AdminForgotPasswordBody,
+  ResetPasswordBody,
+  GetSettingsResponse,
+  UpdateAdminSettingsBody,
+  UpdateAdminSettingsResponse,
+} from "@workspace/api-zod";
 
 const router: IRouter = Router();
 
@@ -142,6 +151,27 @@ router.post("/admin/change-password", requireAdmin, async (req, res): Promise<vo
   const newHash = await bcrypt.hash(parsed.data.newPassword, 12);
   await db.update(adminConfigTable).set({ passwordHash: newHash, updatedAt: new Date() }).where(eq(adminConfigTable.id, config.id));
   res.json({ authenticated: true });
+});
+
+router.get("/settings", async (req, res): Promise<void> => {
+  const config = await getOrCreateAdminConfig();
+  res.json(GetSettingsResponse.parse({ whatsappNumber: config.whatsappNumber }));
+});
+
+router.put("/admin/settings", requireAdmin, async (req, res): Promise<void> => {
+  const parsed = UpdateAdminSettingsBody.safeParse(req.body);
+  if (!parsed.success) {
+    res.status(400).json({ error: "whatsappNumber is required" });
+    return;
+  }
+  const whatsappNumber = parsed.data.whatsappNumber.trim();
+  if (!/^\d{10,15}$/.test(whatsappNumber)) {
+    res.status(400).json({ error: "whatsappNumber must be digits only, including country code (10-15 digits)" });
+    return;
+  }
+  const config = await getOrCreateAdminConfig();
+  await db.update(adminConfigTable).set({ whatsappNumber, updatedAt: new Date() }).where(eq(adminConfigTable.id, config.id));
+  res.json(UpdateAdminSettingsResponse.parse({ whatsappNumber }));
 });
 
 router.get("/admin/summary", requireAdmin, async (req, res): Promise<void> => {
