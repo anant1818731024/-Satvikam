@@ -116,8 +116,8 @@ export default function Menu() {
               onClick={() => handleCardClick(product)}
             >
               {product.imageUrl && (
-                <div className="h-48 overflow-hidden">
-                  <img src={product.imageUrl} alt={product.name} className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-300" />
+                <div className="h-48 overflow-hidden bg-muted">
+                  <img src={product.imageUrl} alt={product.name} className="w-full h-full object-contain group-hover:scale-105 transition-transform duration-300" />
                 </div>
               )}
               <div className="p-6 flex flex-col flex-1">
